@@ -31,25 +31,9 @@ function MedecinPage() {
    // const [currentPage, setCurrentPage] = useState(1);
    const [itemsPerPage, setItemsPerPage] = useState(5);
 
-   const [modalActive, setModalActive] = useState(false);
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
-   useEffect(() => {
-      paginate(1);
-   }, [filteredData]);
-
-   useEffect(() => {
-      initializeForm();
-      loadData();
-   }, []);
-
-   const loadData = async () => {
-      const res = await fetch(`${BASE_URL}/controllers/medecin/getAll.php`);
-      const data = await res.json();
-      setMedecins(data);
-      setFilteredData(data);
-   };
-
+   const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
       setModalActive(true);
       document.querySelector("body").classList.add("modal__active");
@@ -62,23 +46,38 @@ function MedecinPage() {
       initializeForm();
    };
 
+   useEffect(() => {
+      paginate(1);
+   }, [filteredData]);
+
+   useEffect(() => {
+      console.log(medecins);
+      initializeForm();
+      loadData();
+   }, []);
+
+   const loadData = async () => {
+      const res = await fetch(`${BASE_URL}/api/medecin/getAll.php`);
+      const data = await res.json();
+      setMedecins(data);
+      setFilteredData(data);
+   };
+
    const handleSubmit = (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
+      console.log(Object.fromEntries(formData));
       const idUtilisateur = formData.get("idUtilisateur");
       if (idUtilisateur) {
-         fetch(BASE_URL + "/controllers/medecin/put.php", {
+         fetch(BASE_URL + "/api/medecin/put.php", {
             method: "post",
             body: formData,
          })
             .then((res) => {
-               if (res.status === 200) {
-                  return res.json();
-               } else {
-                  throw Error;
-               }
+               return res.json();
             })
             .then((data) => {
+               console.log(data);
                setMedecins(
                   medecins.map((m) => {
                      if (m.idUtilisateur === idUtilisateur) {
@@ -101,7 +100,7 @@ function MedecinPage() {
             })
             .catch((err) => {});
       } else {
-         fetch(BASE_URL + "/controllers/medecin/post.php", {
+         fetch(BASE_URL + "/api/medecin/post.php", {
             method: "post",
             body: formData,
          })
@@ -121,25 +120,26 @@ function MedecinPage() {
       }
    };
 
-   const ajouterMedecin = () => {
+   const onAjouteMedecin = () => {
       showModal();
    };
 
-   const supprimerMedecin = (id) => {
+   const onDeleteMedecin = (id) => {
+      console.log(medecins);
       const resultat = window.confirm(
          "are you sure you want to delete this record"
       );
       if (resultat) {
-         fetch(`${BASE_URL}/controllers/medecin/delete.php?id=${id}`)
+         fetch(`${BASE_URL}/api/medecin/delete.php?id=${id}`)
             .then((res) => res.json())
             .then((data) => {
-               setMedecins(medecins.filter((p) => p.idUtilisateur !== id));
-               setFilteredData(medecins);
+               setMedecins(medecins.filter((p) => p.idUtilisateur != id));
+               setFilteredData(medecins.filter((p) => p.idUtilisateur != id));
             });
       }
    };
 
-   const modifierMedecin = (id) => {
+   const onUpdateMedecin = (id) => {
       setModalActive(true);
 
       const form = document.querySelector("#medecinForm");
@@ -151,12 +151,13 @@ function MedecinPage() {
       form.idUtilisateur.value = medecin.idUtilisateur;
       form.nom.value = medecin.nom;
       form.prenom.value = medecin.prenom;
-      form.cne.value = medecin.cne;
+      form.cin.value = medecin.cin;
       form.genre.value = medecin.genre;
       form.situationFamilliale.value = medecin.situationFamilliale;
       form.email.value = medecin.email;
       form.tel.value = medecin.tel;
       form.adresse.value = medecin.adresse;
+      form.dateNaissance.value = medecin.dateNaissance;
    };
 
    const onSearchMedecin = (e) => {
@@ -164,7 +165,7 @@ function MedecinPage() {
       setFilteredData(
          medecins.filter(
             (m) =>
-               m.cne.toLowerCase().includes(mot.toLowerCase()) ||
+               m.cin.toLowerCase().includes(mot.toLowerCase()) ||
                m.nom.toLowerCase().includes(mot.toLowerCase()) ||
                m.prenom.toLowerCase().includes(mot.toLowerCase())
          )
@@ -200,9 +201,7 @@ function MedecinPage() {
 
       setPageData(currentData);
    };
-
    const countPages = Math.ceil(filteredData.length / itemsPerPage);
-
    const handlePageClick = (e) => {
       paginate(e.selected + 1);
    };
@@ -223,7 +222,7 @@ function MedecinPage() {
                />
             </div>
             <div>
-               <button onClick={ajouterMedecin} className="button__1">
+               <button onClick={onAjouteMedecin} className="button__1">
                   Ajouter
                </button>
             </div>
@@ -234,7 +233,7 @@ function MedecinPage() {
             <table className="table__1 ">
                <thead>
                   <tr>
-                     <th>cne</th>
+                     <th>cin</th>
                      <th>profile</th>
                      <th>nom</th>
                      <th>prenom</th>
@@ -244,7 +243,7 @@ function MedecinPage() {
                <tbody>
                   {pageData.map((m, index) => (
                      <tr key={index}>
-                        <td>{m.cne}</td>
+                        <td>{m.cin}</td>
                         <td>
                            <img
                               className="h-20 w-20 object-cover rounded-full border"
@@ -258,14 +257,14 @@ function MedecinPage() {
                            <div className="flex justify-around items-end">
                               <button
                                  onClick={() =>
-                                    modifierMedecin(m.idUtilisateur)
+                                    onUpdateMedecin(m.idUtilisateur)
                                  }
                               >
                                  <i className="text-4xl far fa-edit edit__icon"></i>
                               </button>
                               <button
                                  onClick={() =>
-                                    supprimerMedecin(m.idUtilisateur)
+                                    onDeleteMedecin(m.idUtilisateur)
                                  }
                               >
                                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
@@ -344,14 +343,22 @@ function MedecinPage() {
                   </div>
                   <div className="flex gap-6 mb-4">
                      <div className="w-full">
-                        <label htmlFor="cne">cne :</label>
-                        <input type="text" name="cne" placeholder="cne" />
+                        <label htmlFor="dateNaissance">
+                           date de naissance :
+                        </label>
+                        <input type="date" name="dateNaissance" />
+                     </div>
+                  </div>
+                  <div className="flex gap-6 mb-4">
+                     <div className="w-full">
+                        <label htmlFor="cin">cne :</label>
+                        <input type="text" name="cin" placeholder="cin" />
                      </div>
                      <div className="w-full">
                         <label htmlFor="genre">genre :</label>
                         <select type="text" name="genre">
-                           <option>male</option>
-                           <option>femelle</option>
+                           <option>homme</option>
+                           <option>femme</option>
                         </select>
                      </div>
                      <div className="w-full">

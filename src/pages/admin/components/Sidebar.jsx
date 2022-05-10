@@ -44,8 +44,8 @@ const Sidebar = () => {
                <Link className="link" to="/admin/secretaire">
                   <i className="fas fa-user"></i> Secrétaires
                </Link>
-               <Link className="link" to="/admin/Infermiere">
-                  <i className="fas fa-user"></i> Infermieres
+               <Link className="link" to="/admin/service">
+                  <i className="fas fa-user"></i> Services
                </Link>
                <a className="link">
                   <i className="fas fa-sign-out-alt"></i> log out

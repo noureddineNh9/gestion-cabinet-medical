@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
-
 const Sidebar = () => {
    useEffect(() => {
       const navLinks = document.querySelectorAll(".sidebar .menu .link");
@@ -44,9 +43,6 @@ const Sidebar = () => {
                </Link>
                <Link className="link" to="/secretaire/rendez-vous">
                   <i className="fas fa-user"></i> Rendez-vous
-               </Link>
-               <Link className="link" to="/secretaire/ordonnance">
-                  <i className="fas fa-user"></i> Ordonnances
                </Link>
                <Link className="link" to="/secretaire/diagnistique-audio">
                   <i className="fas fa-user"></i> Diagnostiques audio
