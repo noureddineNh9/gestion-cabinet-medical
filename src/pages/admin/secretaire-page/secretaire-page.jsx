@@ -62,7 +62,7 @@ function SecretairePage() {
             .then((data) => {
                setSecretaireData(
                   SecretaireData.map((m) => {
-                     if (m.idUtilisateur === idUtilisateur) {
+                     if (m.idUtilisateur == idUtilisateur) {
                         return data;
                      } else {
                         return m;
@@ -71,7 +71,7 @@ function SecretairePage() {
                );
                setFilteredData(
                   SecretaireData.map((m) => {
-                     if (m.idUtilisateur === idUtilisateur) {
+                     if (m.idUtilisateur == idUtilisateur) {
                         return data;
                      } else {
                         return m;

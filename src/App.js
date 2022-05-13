@@ -33,6 +33,8 @@ import Loading from "./components/utils/loading/loading";
 import ProtectedRoute from "./components/utils/ProtectedRoute";
 import { setCurrentUser } from "./redux/user/user.actions";
 import { BASE_URL } from "./api/api";
+import Notification from "./components/utils/notification/notification";
+import { setNotificationOff } from "./redux/notification/notification.actions";
 
 function App() {
    const [isLoading, setIsLoading] = useState(true);
@@ -41,6 +43,15 @@ function App() {
    // * load user from local storage
 
    const user = useSelector((state) => state.user);
+   const notification = useSelector((state) => state.notification);
+
+   useEffect(() => {
+      if (notification.active) {
+         setTimeout(() => {
+            dispatch(setNotificationOff());
+         }, notification.time);
+      }
+   }, [notification]);
 
    useEffect(() => {
       const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
@@ -60,39 +71,67 @@ function App() {
       }
    }, [user]);
    const loadData = () => {
-      return new Promise((resolve) => {
-         setTimeout(async () => {
-            try {
-               const res = await fetch(BASE_URL + "/api/patient/getAll.php");
-               if (res.status === 200) {
-                  const patientData = await res.json();
-                  dispatch(setPatientsData(patientData));
-               } else {
-                  throw new Error();
-               }
-            } catch (error) {
-               console.log(error);
+      return new Promise(async (resolve) => {
+         try {
+            const res = await fetch(BASE_URL + "/api/patient/getAll.php");
+            if (res.status === 200) {
+               const patientData = await res.json();
+               dispatch(setPatientsData(patientData));
+            } else {
+               throw new Error();
             }
+         } catch (error) {
+            console.log(error);
+         }
 
-            // get tous les elements santés
-            dispatch(setElementsSanteData(ELEMENT_SANTE_DATA));
+         // get tous les elements santés
+         try {
+            const res = await fetch(BASE_URL + "/api/element-sante/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setElementsSanteData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
 
-            // get tous les consultation
-            dispatch(setConsultationData(CONSULTATION_DATA));
+         // get tous les consultation
+         try {
+            const res = await fetch(BASE_URL + "/api/consultation/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setConsultationData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
 
-            //
-            dispatch(setPrescriptionData(PRESCRIPTION_DATA));
+         //
+         try {
+            const res = await fetch(BASE_URL + "/api/prescription/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setPrescriptionData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
 
-            // get tous les consultation
-            dispatch(setCompteRenduData(COMPTE_RENDU_DATA));
+         // get tous les consultation
+         dispatch(setCompteRenduData(COMPTE_RENDU_DATA));
 
-            // get tous les consultation
-            dispatch(setExamenData(EXAMEN_DATA));
+         // get tous les consultation
+         dispatch(setExamenData(EXAMEN_DATA));
 
-            // get tous les medecin
-            dispatch(setMedecinData(MEDECIN_DATA));
-            resolve();
-         }, 2500);
+         // get tous les medecin
+         dispatch(setMedecinData(MEDECIN_DATA));
+         resolve();
       });
    };
 
@@ -101,47 +140,54 @@ function App() {
          {isLoading ? (
             <Loading />
          ) : (
-            <Switch>
-               <Route
-                  exact
-                  path="/"
-                  render={() => {
-                     if (user.currentUser) {
-                        if (user.type === "medecin") {
-                           return <Redirect to="/medecin" />;
-                        } else if (user.type === "secretaire") {
-                           return <Redirect to="/secretaire" />;
-                        }
-                     } else {
-                        return <Redirect to="/login" />;
-                     }
-                  }}
-               />
-               <Route
-                  exact
-                  path="/login"
-                  render={() => {
-                     if (user.currentUser) {
-                        return <Redirect to="/" />;
-                     } else {
-                        return <Login />;
-                     }
-                  }}
-               />
-               <ProtectedRoute
-                  path="/secretaire"
-                  type="secretaire"
-                  component={secretaireRoute}
-               />
-               <Route path="/admin" component={adminRoute} />
-               <ProtectedRoute
-                  path="/medecin"
-                  type="medecin"
-                  component={MedecinRoute}
+            <>
+               <Notification
+                  message={notification.message}
+                  className={notification.active && "active"}
                />
 
-               <Route path="*" component={NotFound} />
-            </Switch>
+               <Switch>
+                  <Route
+                     exact
+                     path="/"
+                     render={() => {
+                        if (user.currentUser) {
+                           if (user.type === "medecin") {
+                              return <Redirect to="/medecin" />;
+                           } else if (user.type === "secretaire") {
+                              return <Redirect to="/secretaire" />;
+                           }
+                        } else {
+                           return <Redirect to="/login" />;
+                        }
+                     }}
+                  />
+                  <Route
+                     exact
+                     path="/login"
+                     render={() => {
+                        if (user.currentUser) {
+                           return <Redirect to="/" />;
+                        } else {
+                           return <Login />;
+                        }
+                     }}
+                  />
+                  <ProtectedRoute
+                     path="/secretaire"
+                     type="medecin"
+                     component={secretaireRoute}
+                  />
+                  <Route path="/admin" component={adminRoute} />
+                  <ProtectedRoute
+                     path="/medecin"
+                     type="medecin"
+                     component={MedecinRoute}
+                  />
+
+                  <Route path="*" component={NotFound} />
+               </Switch>
+            </>
          )}
       </div>
    );

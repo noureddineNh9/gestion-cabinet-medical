@@ -55,7 +55,7 @@ export const ELEMENT_SANTE_DATA = [
 export const CONSULTATION_DATA = [
    {
       idConsultation: 83,
-      date: new Date(),
+      dateCreation: "05/11/2022",
       type: "visite",
       duree: 60,
       hauteur: 175.5,
@@ -64,6 +64,7 @@ export const CONSULTATION_DATA = [
       remarques:
          "Le motif de consultation est ce que le patient apporte lors de la consultation comme demande, plainte, symptôme. C'est la clé d'entrée en relation entre le médecin et le patient. Les premières minutes de l'entrevue sont généralement consacrées à l'identification du motif de recours du patient.",
       idMedecin: 155,
+      idElement: 6,
    },
 ];
 

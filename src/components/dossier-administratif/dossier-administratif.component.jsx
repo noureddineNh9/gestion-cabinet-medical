@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { BASE_URL } from "../../api/api";
 import defaultImageProfile from "../../assets/images/default-img-profile.jpg";
+import { setNotificationOn } from "../../redux/notification/notification.actions";
 import { updatePatient } from "../../redux/patient/patient.actions";
 
 function DossierAdministratif({ patient }) {
@@ -23,6 +24,11 @@ function DossierAdministratif({ patient }) {
    const handleSubmit = async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
+      if (formData.get("decede")) {
+         formData.set("decede", true);
+      } else {
+         formData.append("decede", false);
+      }
       try {
          const res = await fetch(BASE_URL + "/api/patient/put.php", {
             method: "post",
@@ -31,8 +37,14 @@ function DossierAdministratif({ patient }) {
 
          if (res.status === 200) {
             const data = await res.json();
+            console.log(data);
             dispatch(updatePatient(data));
-            alert("modification avec success");
+            dispatch(
+               setNotificationOn({
+                  time: 3000,
+                  message: "modification avec success",
+               })
+            );
          } else {
             throw Error;
          }
@@ -157,11 +169,23 @@ function DossierAdministratif({ patient }) {
             <br />
             <hr />
             <br />
+            <div className="input__group">
+               <label htmlFor="groupeSanguin">groupe sanguin :</label>
+               <input
+                  type="text"
+                  name="groupeSanguin"
+                  defaultValue={patient.groupeSanguin}
+               />
+            </div>
             <div className="input__group flex items-center">
                <label htmlFor="">
                   <span>&#9888;</span> Patient décédé :
                </label>
-               <input type="checkbox" name="decede" />
+               <input
+                  type="checkbox"
+                  name="decede"
+                  defaultChecked={patient.decede}
+               />
             </div>
             <div className="input__group"></div>
 

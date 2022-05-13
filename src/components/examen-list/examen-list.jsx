@@ -199,7 +199,7 @@ function ExamenList({ idConsultation }) {
                      </div>
 
                      {[...Array(NbDocuments)].map((e, i) => (
-                        <input type="file" name={`fichiers[]`} />
+                        <input key={i} type="file" name={`fichiers[]`} />
                      ))}
                   </div>
                   <hr />

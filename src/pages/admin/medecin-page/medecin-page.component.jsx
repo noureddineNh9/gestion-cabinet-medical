@@ -80,7 +80,7 @@ function MedecinPage() {
                console.log(data);
                setMedecins(
                   medecins.map((m) => {
-                     if (m.idUtilisateur === idUtilisateur) {
+                     if (m.idUtilisateur == idUtilisateur) {
                         return data;
                      } else {
                         return m;
@@ -89,7 +89,7 @@ function MedecinPage() {
                );
                setFilteredData(
                   medecins.map((m) => {
-                     if (m.idUtilisateur === idUtilisateur) {
+                     if (m.idUtilisateur == idUtilisateur) {
                         return data;
                      } else {
                         return m;

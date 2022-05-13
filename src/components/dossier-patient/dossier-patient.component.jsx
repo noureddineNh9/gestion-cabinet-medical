@@ -1,23 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link, Route, Switch } from "react-router-dom";
+import Antecedents from "../antecedents/antecedents.component";
 import ConsultationList from "../consultation-list/consultation-list";
 
 import Consultation from "../consultation/consultation.component";
 import DossierAdministratif from "../dossier-administratif/dossier-administratif.component";
+import ElementSanteList from "../element-sante-list/element-sante-list";
 
 import "./dossier-patient.styles.scss";
 
 function DossierPatient(props) {
    const idPatient = props.match.params.id;
    const patient = useSelector((state) => {
-      return state.patient.filter((p) => p.idUtilisateur === idPatient)[0];
+      return state.patient.filter((p) => p.idUtilisateur == idPatient)[0];
    });
 
-   const consultations = useSelector((state) => {
+   let consultations = useSelector((state) => state.consultation);
+
+   consultations = useSelector((state) => {
       var list = new Array();
       state.elementSante.map((ele) => {
-         if (ele.idPatient == idPatient) list = [...list, ...ele.consultations];
+         if (ele.idPatient == idPatient) {
+            list = [
+               ...list,
+               ...consultations.filter((c) => c.idElement == ele.idElement),
+            ];
+         }
       });
       return list;
    });
@@ -67,6 +76,19 @@ function DossierPatient(props) {
                      Consultations
                   </Link>
                </li>
+               <li>
+                  <Link to={`${props.match.url}/antecedents`} className="link">
+                     Antecedents
+                  </Link>
+               </li>
+               <li>
+                  <Link
+                     to={`${props.match.url}/element-sante`}
+                     className="link"
+                  >
+                     Elements santé
+                  </Link>
+               </li>
             </ul>
          </div>
          <div className="content p-8">
@@ -90,7 +112,19 @@ function DossierPatient(props) {
                   path={`${props.match.url}/consultation/:id`}
                   component={Consultation}
                />
+               <Route
+                  exact
+                  path={`${props.match.url}/antecedents`}
+                  component={Antecedents}
+               />
+               <Route
+                  path={`${props.match.url}/element-sante`}
+                  component={() => <ElementSanteList idPatient={idPatient} />}
+               />
             </Switch>
+            <br />
+            <br />
+            <br />
          </div>
       </div>
    );
