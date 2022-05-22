@@ -1,6 +1,7 @@
 const INITIAL_STATE = {
    active: false,
-   message: "Default notification",
+   message: "",
+   type: "",
    time: 0,
 };
 
@@ -10,12 +11,14 @@ const NotificationReducer = (state = INITIAL_STATE, action) => {
          return {
             active: true,
             message: action.payload.message,
+            type: action.payload.type,
             time: action.payload.time,
          };
       case "SET_NOTIFICATION_OFF":
          return {
             active: false,
             message: "",
+            type: "",
             time: 0,
          };
       default:

@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import "./dropdown-list.styles.scss";
 
 function DropdownList({ values, setSelectedValue, selectedValue }) {
    const [filteredData, setFilteredData] = useState(values);
 
+   const dropdownListElement = useRef();
+   const dropdownInputElement = useRef();
+
    useEffect(() => {
       window.addEventListener("click", function (e) {
-         if (!document.getElementById("dropdown-input").contains(e.target)) {
+         if (
+            dropdownInputElement.current &&
+            !dropdownInputElement.current.contains(e.target)
+         ) {
             // Clicked outside the box
-            if (
-               !document
-                  .getElementById("dropdown-list")
-                  .classList.contains("hidden")
-            ) {
-               document.getElementById("dropdown-list").classList.add("hidden");
+            if (!dropdownListElement.current.classList.contains("hidden")) {
+               dropdownListElement.current.classList.add("hidden");
             }
          }
       });
@@ -26,7 +28,7 @@ function DropdownList({ values, setSelectedValue, selectedValue }) {
    };
 
    const toggleDropdownList = () => {
-      document.getElementById("dropdown-list").classList.toggle("hidden");
+      dropdownListElement.current.classList.toggle("hidden");
    };
 
    const onSearch = (e) => {
@@ -37,7 +39,7 @@ function DropdownList({ values, setSelectedValue, selectedValue }) {
    };
 
    return (
-      <div id="dropdown-input" className="relative ">
+      <div ref={dropdownInputElement} className="relative ">
          <input
             onClick={toggleDropdownList}
             value={selectedValue ? selectedValue.value : ""}
@@ -50,7 +52,7 @@ function DropdownList({ values, setSelectedValue, selectedValue }) {
          </span>
          <div
             className="bg-gray-300 absolute w-full z-10 hidden border-2 -mt-4"
-            id="dropdown-list"
+            ref={dropdownListElement}
          >
             <div className="flex items-center bg-slate-100 px-4 pt-4">
                <div className="relative m-3 w-full">
@@ -71,9 +73,9 @@ function DropdownList({ values, setSelectedValue, selectedValue }) {
                      <li
                         onClick={() => onSelect(m)}
                         key={m.id}
-                        className=" flex items-center py-5 px-8 border-t"
+                        className="flex items-center py-5 px-8 border-t cursor-pointer hover:bg-slate-50"
                      >
-                        <i class="fas fa-user-md mr-4"></i>
+                        <i className="fas fa-user-md mr-4"></i>
                         <p className="">{m.value}</p>
                      </li>
                   ))}

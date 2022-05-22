@@ -1,42 +1,61 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
+import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
+import { selectRdvByMedecin } from "../../../redux/rendez-vous/rendez-vous.selectors";
+
 function RendezVous() {
+   const [filteredItems, setFilteredItems] = useState([]);
+
+   const currentUser = useSelector((state) => state.user.currentUser);
+
+   const RendezVousData = useSelector((state) =>
+      selectRdvByMedecin(state, currentUser.idUtilisateur)
+   );
+
+   useEffect(() => {
+      setFilteredItems(RendezVousData);
+   }, [RendezVousData]);
+
+   const columns = [
+      {
+         name: "patient",
+         selector: (row) => row.nomPatient,
+         sortable: true,
+      },
+      {
+         name: "type",
+         selector: (row) => row.type,
+         sortable: true,
+      },
+      {
+         name: "date de RDV",
+         selector: (row) => row.dateRDV,
+         sortable: true,
+      },
+      {
+         name: "",
+         cell: (row) => (
+            <>
+               <Link className="lien" to={`/medecin/dossier/${row.idPatient}`}>
+                  le dossier de patient
+               </Link>
+            </>
+         ),
+      },
+   ];
    return (
-      <div className="p-8">
+      <div className="">
          <h3 className="mb-6">Mes Rendez-vous</h3>
-         <table className="table__1 ">
-            <thead>
-               <tr>
-                  <th>CIN</th>
-                  <th>nom et prenom</th>
-                  <th>date</th>
-                  <th></th>
-               </tr>
-            </thead>
-            <tbody>
-               <tr>
-                  <td>BR3457</td>
-                  <td>Khalid loui</td>
-                  <td>Aujourd'hui 15:00</td>
-                  <td>
-                     <Link className="lien" to="/medecin/dossier/12">
-                        le dossier de patient
-                     </Link>
-                  </td>
-               </tr>
-               <tr>
-                  <td>BR3457</td>
-                  <td>amine koulali</td>
-                  <td>12-06-2022 15:00</td>
-                  <td>
-                     <a className="lien" href="">
-                        le dossier de patient
-                     </a>
-                  </td>
-               </tr>
-            </tbody>
-         </table>
+
+         <MyDataTable
+            columns={columns}
+            data={filteredItems}
+            // defaultSortField="idElement"
+            striped
+            pagination
+         />
       </div>
    );
 }

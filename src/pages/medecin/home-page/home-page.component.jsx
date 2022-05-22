@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 function HomePage() {
    return (
-      <div className="p-8">
+      <div className="">
          <h3 className="mb-6">home</h3>
       </div>
    );

@@ -401,7 +401,7 @@ export const Prescription = ({ idConsultation }) => {
                   onClick={onAjoutePrescription}
                   className="button__4 mt-80"
                >
-                  ajoutet la prescription
+                  ajouter la prescription
                </button>
             </div>
          )}

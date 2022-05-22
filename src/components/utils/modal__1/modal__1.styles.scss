@@ -1,7 +1,7 @@
 .task__modal {
    &.active {
       opacity: 1;
-      z-index: 100;
+      z-index: 200;
       .modal__wrapper {
          right: 0;
       }
@@ -14,7 +14,7 @@
    top: 0;
    right: 0;
    opacity: 0;
-   transition: all 0.5s;
+   //transition: all 0.5s;
 
    .modal__wrapper {
       position: absolute;
@@ -82,7 +82,7 @@
       .close {
          position: absolute;
          z-index: 200;
-         right: 0px;
+         right: 5px;
          /*left: 20px; */
          top: 0px;
          height: 40px;

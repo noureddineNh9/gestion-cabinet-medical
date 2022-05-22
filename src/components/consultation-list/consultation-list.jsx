@@ -29,7 +29,7 @@ const ConsulationsData = [
    },
 ];
 
-function ConsultationList({ idElement, consultations }) {
+function ConsultationList({ idElement, consultations, mode }) {
    const [filteredItems, setFilteredItems] = useState([]);
    const [searchInputValue, setSearchInputValue] = useState("");
    const [Operation, setOperation] = useState("Ajouter");
@@ -72,9 +72,11 @@ function ConsultationList({ idElement, consultations }) {
                <Link to={`${match.url}/${row.idConsultation}`} className="lien">
                   <i className="text-4xl far fa-eye edit__icon"></i>
                </Link>
-               <button onClick={() => onDelete(row.idElement)}>
-                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
-               </button>
+               {mode !== "read" && (
+                  <button onClick={() => onDelete(row.idElement)}>
+                     <i className="text-4xl far fa-trash-alt delete__icon"></i>
+                  </button>
+               )}
             </>
          ),
          width: "120px",
@@ -178,11 +180,13 @@ function ConsultationList({ idElement, consultations }) {
                   placeholder="Search for items"
                />
             </div>
-            <div>
-               <button onClick={onAjoute} className="button__1">
-                  Ajouter
-               </button>
-            </div>
+            {mode !== "read" && (
+               <div>
+                  <button onClick={onAjoute} className="button__1">
+                     Ajouter
+                  </button>
+               </div>
+            )}
          </div>
          <hr />
          <br />

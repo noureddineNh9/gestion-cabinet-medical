@@ -1,10 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BASE_URL } from "../../api/api";
+import {
+   addExamen,
+   deleteDocument,
+   deleteExamen,
+   updateExamen,
+} from "../../redux/examen/examen.action";
+import { setNotificationOn } from "../../redux/notification/notification.actions";
 import Modal from "../utils/modal__1/modal__1.component";
 
 function ExamenList({ idConsultation }) {
-   const [NbDocuments, setNbDocuments] = useState(2);
+   const [NbDocuments, setNbDocuments] = useState(1);
    const dispatch = useDispatch();
    const formElement = useRef();
    const collapseList = useRef();
@@ -58,33 +65,94 @@ function ExamenList({ idConsultation }) {
       });
    }, []);
 
-   const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
       e.preventDefault();
 
       const formData = new FormData(formElement.current);
       const json = Object.fromEntries(formData);
 
-      fetch(BASE_URL + "/test.php", {
-         method: "post",
-         body: formData,
-      })
-         .then((res) => {
-            if (res.status === 200) {
-               return res.json();
-            } else {
-               throw Error;
-            }
-         })
-         .then((data) => {
-            console.log(data);
-         })
-         .catch((err) => {});
+      if (!formData.get("idExamen")) {
+         try {
+            const res = await fetch(BASE_URL + "/api/examen/post.php", {
+               method: "post",
+               body: formData,
+            });
 
-      console.log(json);
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(addExamen(data));
+               dispatch(
+                  setNotificationOn({ time: 3000, message: "examen ajouté" })
+               );
+               hideModal();
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
+      } else {
+         try {
+            const res = await fetch(BASE_URL + "/api/examen/put.php", {
+               method: "post",
+               body: formData,
+            });
+
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(updateExamen(data));
+               dispatch(
+                  setNotificationOn({ time: 3000, message: "examen modifié" })
+               );
+               hideModal();
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
+      }
    };
 
    const onAjouterExamen = () => {
       showModal();
+   };
+
+   const onUpdateExamen = (examen) => {
+      formElement.current.idExamen.value = examen.idExamen;
+      formElement.current.nom.value = examen.nom;
+      formElement.current.type.value = examen.type;
+      formElement.current.description.value = examen.description;
+
+      showModal();
+   };
+
+   const onDeleteExamen = async (id) => {
+      try {
+         const res = await fetch(BASE_URL + "/api/examen/delete.php?id=" + id);
+
+         if (res.status === 200) {
+            dispatch(deleteExamen({ idExamen: id }));
+            dispatch(
+               setNotificationOn({ time: 3000, message: "examen supprimé" })
+            );
+         }
+      } catch (error) {
+         console.log("erreur");
+      }
+   };
+
+   const onDeleteDocument = async (idDocument, idExamen) => {
+      try {
+         const res = await fetch(
+            BASE_URL + "/api/document/delete.php?id=" + idDocument
+         );
+
+         if (res.status === 200) {
+            dispatch(deleteDocument({ idExamen, idDocument }));
+            dispatch(
+               setNotificationOn({ time: 3000, message: "document supprimé" })
+            );
+         }
+      } catch (error) {
+         console.log("erreur");
+      }
    };
 
    const increaseNbDocuments = () => {
@@ -121,25 +189,43 @@ function ExamenList({ idConsultation }) {
                <tbody>
                   {examens.map((e) => (
                      <tr key={e.idExamen}>
-                        <td>{e.nom}</td>
+                        <td className="flex max-w-md">{e.nom}</td>
                         <td>
                            {e.documents.map((d) => (
-                              <>
-                                 <div className="mb-2">
-                                    <i className="text-4xl far fa-file-pdf mr-3"></i>
+                              <div
+                                 key={d.idDocument}
+                                 className="flex justify-between items-center mb-3 bg-gray-100 px-4 py-3 rounded-md"
+                              >
+                                 <div className="">
+                                    <a href={BASE_URL + d.url} target="_blank">
+                                       <i className="text-3xl text-gray-700 far fa-file-alt mr-3"></i>
+                                    </a>
                                     {d.nom}
                                  </div>
-                              </>
+                                 <button
+                                    onClick={() =>
+                                       onDeleteDocument(
+                                          d.idDocument,
+                                          d.idExamen
+                                       )
+                                    }
+                                    className="text-4xl text-gray-500"
+                                 >
+                                    &#x2715;
+                                 </button>
+                              </div>
                            ))}
                         </td>
 
                         <td>
                            <div className="flex justify-around items-end">
-                              <button>
+                              <button onClick={() => onUpdateExamen(e)}>
                                  {/* <i className="text-4xl fas fa-eye edit__icon"></i> */}
                                  <i className="text-4xl far fa-edit edit__icon"></i>
                               </button>
-                              <button>
+                              <button
+                                 onClick={() => onDeleteExamen(e.idExamen)}
+                              >
                                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
                               </button>
                            </div>
@@ -168,11 +254,16 @@ function ExamenList({ idConsultation }) {
                      type="number"
                      name="idConsultation"
                      defaultValue={idConsultation}
+                     hidden
                   />
-                  <input type="number" name="idExamen" />
+                  <input type="number" name="idExamen" hidden />
                   <div className="w-full">
                      <label htmlFor="nom">nom d'examen :</label>
                      <input type="text" name="nom" />
+                  </div>
+                  <div className="w-full">
+                     <label htmlFor="type">type d'examen :</label>
+                     <input type="text" name="type" />
                   </div>
                   <div className="w-full">
                      <label htmlFor="description">description :</label>
@@ -180,9 +271,10 @@ function ExamenList({ idConsultation }) {
                   </div>
                   <div className="w-full">
                      <div className="flex mb-4 items-center">
-                        <label htmlFor="email">nombre de document </label>
+                        <label>nombre de document </label>
                         <div className="">
                            <button
+                              type="button"
                               onClick={decreaseNbDocuments}
                               className="px-4 pb-1 text-4xl mx-4 border"
                            >
@@ -190,6 +282,7 @@ function ExamenList({ idConsultation }) {
                            </button>
                            <span>{NbDocuments}</span>
                            <button
+                              type="button"
                               onClick={increaseNbDocuments}
                               className="px-4 pb-1 text-4xl mx-4 border"
                            >
@@ -197,15 +290,22 @@ function ExamenList({ idConsultation }) {
                            </button>
                         </div>
                      </div>
+                     <hr />
+                     <br />
 
                      {[...Array(NbDocuments)].map((e, i) => (
-                        <input key={i} type="file" name={`fichiers[]`} />
+                        <div key={i}>
+                           <label htmlFor="">document {i + 1}</label>
+                           <input type="text" name={`nomFichiers[]`} />
+                           <input type="file" name={`fichiers[]`} />
+                           <hr />
+                           <br />
+                        </div>
                      ))}
                   </div>
-                  <hr />
                   <br />
                   <button className="button__1" type="submit">
-                     Ajouter
+                     Submit
                   </button>
                </form>
             </div>

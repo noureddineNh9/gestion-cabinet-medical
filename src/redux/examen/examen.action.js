@@ -3,11 +3,22 @@ export const setExamenData = (data) => ({
    payload: data,
 });
 
-export const ajouterExamen = (data) => ({
+export const addExamen = (data) => ({
    type: "ADD_EXAMEN",
    payload: data,
 });
+
+export const updateExamen = (data) => ({
+   type: "UPDATE_EXAMEN",
+   payload: data,
+});
+
 export const deleteExamen = (data) => ({
    type: "DELETE_EXAMEN",
+   payload: data,
+});
+
+export const deleteDocument = (data) => ({
+   type: "DELETE_DOCUMENT",
    payload: data,
 });

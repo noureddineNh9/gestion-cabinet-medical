@@ -15,6 +15,8 @@ import {
 } from "../../../redux/patient/patient.actions";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
+import UpdatePassword from "../../admin/components/UpdatePassword";
 
 function PatientList() {
    const PatientData = useSelector((state) => state.patient);
@@ -108,26 +110,6 @@ function PatientList() {
       }
    };
 
-   const onUpdate = (id) => {
-      setModalActive(true);
-
-      const form = document.querySelector("#medecinForm");
-      const medecin = PatientData.filter((p) => p.idUtilisateur === id)[0];
-
-      setPreviewImage(BASE_URL + medecin.imageProfile);
-
-      form.idUtilisateur.value = medecin.idUtilisateur;
-      form.nom.value = medecin.nom;
-      form.prenom.value = medecin.prenom;
-      form.cin.value = medecin.cin;
-      form.genre.value = medecin.genre;
-      form.situationFamilliale.value = medecin.situationFamilliale;
-      form.email.value = medecin.email;
-      form.tel.value = medecin.tel;
-      form.adresse.value = medecin.adresse;
-      form.dateNaissance.value = medecin.dateNaissance;
-   };
-
    const onSearch = (e) => {
       const mot = e.target.value;
       setFilteredData(
@@ -172,8 +154,63 @@ function PatientList() {
       paginate(e.selected + 1);
    };
 
+   const columns = [
+      {
+         name: "cin",
+         selector: (row) => row.cin,
+         sortable: true,
+         maxWidth: "150px",
+      },
+      {
+         name: "profile",
+         selector: (row) => (
+            <div className="py-4">
+               <img
+                  className="h-20 w-20 object-cover rounded-full border"
+                  src={BASE_URL + row.imageProfile}
+                  alt=""
+               />
+            </div>
+         ),
+         sortable: true,
+         maxWidth: "150px",
+
+         style: {
+            margin: "flex",
+            justifyContent: "space-around",
+         },
+      },
+      {
+         name: "nom complet",
+         selector: (row) => row.nom + " " + row.prenom,
+         sortable: true,
+      },
+      {
+         name: "",
+         cell: (row) => (
+            <>
+               <UpdatePassword idUtilisateur={row.idUtilisateur} />
+               <Link
+                  className="mr-2"
+                  to={`/secretaire/patient/${row.idUtilisateur}`}
+               >
+                  <i className="text-4xl far fa-eye edit__icon"></i>
+               </Link>
+               <button onClick={() => onDelete(row.idUtilisateur)}>
+                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
+               </button>
+            </>
+         ),
+         width: "150px",
+         style: {
+            display: "flex",
+            justifyContent: "space-around",
+         },
+      },
+   ];
+
    return (
-      <div className="p-8">
+      <div className="">
          <div className="flex justify-between mb-8">
             <div className="relative">
                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -196,7 +233,7 @@ function PatientList() {
          <hr />
          <br />
          <div>
-            <table className="table__1 ">
+            {/* <table className="table__1 ">
                <thead>
                   <tr>
                      <th>cin</th>
@@ -221,9 +258,7 @@ function PatientList() {
                         <td>{p.prenom}</td>
                         <td>
                            <div className="flex justify-around items-end">
-                              {/* <button onClick={() => onUpdate(m.idUtilisateur)}>
-                                 <i className="text-4xl far fa-edit edit__icon"></i>
-                              </button> */}
+
                               <Link
                                  className="lien"
                                  to={`/secretaire/patient/${p.idUtilisateur}`}
@@ -254,7 +289,14 @@ function PatientList() {
                   subContainerClassName={"pages pagination"}
                   activeClassName={"active"}
                />
-            </div>
+            </div> */}
+            <MyDataTable
+               columns={columns}
+               data={filteredData}
+               // defaultSortField="idElement"
+               striped
+               pagination
+            />
          </div>
 
          {/* *******************************  Modal  *************************************** */}

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import LogoutButton from "../../components/LogoutButton";
 
 const Sidebar = () => {
    useEffect(() => {
@@ -44,12 +45,15 @@ const Sidebar = () => {
                <Link className="link" to="/medecin/rendez-vous">
                   <i className="fas fa-user"></i> Mes Rendez-vous
                </Link>
-               <Link className="link" to="/medecin/patient">
+               <Link className="link" to="/medecin/consultations">
                   <i className="fas fa-user"></i> Consultations
                </Link>
-               <a className="link">
+               <Link className="link" to="/medecin/modifier-motDePasse">
+                  <i className="fas fa-key"></i> changer le mot de passe
+               </Link>
+               <LogoutButton className="link">
                   <i className="fas fa-sign-out-alt"></i> log out
-               </a>
+               </LogoutButton>
             </ul>
          </div>
       </>

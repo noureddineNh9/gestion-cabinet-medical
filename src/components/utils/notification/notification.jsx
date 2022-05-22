@@ -1,9 +1,13 @@
 import React from "react";
 import "./notification.styles.scss";
 
-function Notification({ message, className }) {
+function Notification({ message, className, type }) {
    return (
-      <div className={`notification__container flex ${className && className}`}>
+      <div
+         className={`notification__container flex ${className && className} ${
+            type ? type : "default"
+         }`}
+      >
          <div className="mr-6">
             {/* <i className="text-4xl fas fa-check"></i> */}
             <i className="text-4xl far fa-bell"></i>

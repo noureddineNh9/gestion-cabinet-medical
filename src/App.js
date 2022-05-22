@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import Login from "./pages/login/login.component";
@@ -12,14 +12,7 @@ import { setElementsSanteData } from "./redux/elementSante/elementSante.actions"
 import { setConsultationData } from "./redux/consultation/consultation.action";
 import { setMedecinData } from "./redux/medecin/medecin.actions";
 
-import {
-   COMPTE_RENDU_DATA,
-   CONSULTATION_DATA,
-   ELEMENT_SANTE_DATA,
-   EXAMEN_DATA,
-   MEDECIN_DATA,
-   PRESCRIPTION_DATA,
-} from "./data";
+import { MEDECIN_DATA } from "./data";
 import PATIENTS_DATA from "./redux/patient/patients-data";
 
 import "./styles/tailwind.css";
@@ -28,13 +21,19 @@ import { setCompteRenduData } from "./redux/compteRendu/compteRendu.actions";
 import { setPrescriptionData } from "./redux/prescription/prescription.actions";
 import { setExamenData } from "./redux/examen/examen.action";
 import NotFound from "./pages/not-found/not-found";
-import { Redirect } from "react-router-dom";
 import Loading from "./components/utils/loading/loading";
 import ProtectedRoute from "./components/utils/ProtectedRoute";
 import { setCurrentUser } from "./redux/user/user.actions";
 import { BASE_URL } from "./api/api";
 import Notification from "./components/utils/notification/notification";
 import { setNotificationOff } from "./redux/notification/notification.actions";
+import { setSecretaireData } from "./redux/secretaire/secretaire.actions";
+
+import Cookies from "js-cookie";
+import { setRendezVousData } from "./redux/rendez-vous/rendez-vous.actions";
+import { setAntecedentData } from "./redux/antecedent/antecedent.actions";
+import PatientRoute from "./routes/patientRoute";
+import { setServiceData } from "./redux/service/service.actions";
 
 function App() {
    const [isLoading, setIsLoading] = useState(true);
@@ -61,9 +60,46 @@ function App() {
    }, []);
 
    useEffect(() => {
+      // var sessionId = ";";
+      // try {
+      //    const res = await fetch(BASE_URL + "/setSession.php", {
+      //       credentials: "same-origin",
+      //    });
+      //    if (res.status === 200) {
+      //       const data = await res.json();
+
+      //       Cookies.remove("PHPSESSID");
+
+      //       Cookies.set("PHPSESSID", data);
+
+      //       try {
+      //          const res = await fetch(BASE_URL + "/getSession.php", {
+      //             credentials: "same-origin",
+      //             headers: {
+      //                Cookies: document.cookie,
+      //             },
+      //          });
+      //          if (res.status === 200) {
+      //             const data = await res.json();
+
+      //             console.log(data);
+      //          } else {
+      //             throw new Error();
+      //          }
+      //       } catch (error) {
+      //          console.log(error);
+      //       }
+      //    } else {
+      //       throw new Error();
+      //    }
+      // } catch (error) {
+      //    console.log(error);
+      // }
+
       if (user.currentUser) {
          setIsLoading(true);
          loadData().then(() => {
+            console.log(2);
             setIsLoading(false);
          });
       } else {
@@ -72,6 +108,7 @@ function App() {
    }, [user]);
    const loadData = () => {
       return new Promise(async (resolve) => {
+         //les patients
          try {
             const res = await fetch(BASE_URL + "/api/patient/getAll.php");
             if (res.status === 200) {
@@ -84,6 +121,31 @@ function App() {
             console.log(error);
          }
 
+         //les secretaires
+         try {
+            const res = await fetch(BASE_URL + "/api/secretaire/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setSecretaireData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
+
+         // get tous les medecin
+         try {
+            const res = await fetch(BASE_URL + "/api/medecin/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setMedecinData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
          // get tous les elements santés
          try {
             const res = await fetch(BASE_URL + "/api/element-sante/getAll.php");
@@ -110,7 +172,7 @@ function App() {
             console.log(error);
          }
 
-         //
+         //les prescriptions
          try {
             const res = await fetch(BASE_URL + "/api/prescription/getAll.php");
             if (res.status === 200) {
@@ -123,14 +185,68 @@ function App() {
             console.log(error);
          }
 
-         // get tous les consultation
-         dispatch(setCompteRenduData(COMPTE_RENDU_DATA));
+         // les comptes rendu
+         try {
+            const res = await fetch(BASE_URL + "/api/compte-rendu/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setCompteRenduData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
 
          // get tous les consultation
-         dispatch(setExamenData(EXAMEN_DATA));
+         try {
+            const res = await fetch(BASE_URL + "/api/examen/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setExamenData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
 
-         // get tous les medecin
-         dispatch(setMedecinData(MEDECIN_DATA));
+         // Avoir tout les rendez vous
+         try {
+            const res = await fetch(BASE_URL + "/api/rendez-vous/getAll.php");
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(setRendezVousData(data));
+            } else {
+               throw new Error();
+            }
+         } catch (error) {
+            console.log(error);
+         }
+
+         // getAll Antecedants
+         try {
+            const rep = await fetch(BASE_URL + "/api/antecedent/getAll.php");
+
+            if (rep.status === 200) {
+               const data = await rep.json();
+               dispatch(setAntecedentData(data));
+            }
+         } catch (error) {
+            console.log(error);
+         }
+
+         // getAll Services
+         try {
+            const rep = await fetch(BASE_URL + "/api/service/getAll.php");
+
+            if (rep.status === 200) {
+               const data = await rep.json();
+               dispatch(setServiceData(data));
+            }
+         } catch (error) {
+            console.log(error);
+         }
          resolve();
       });
    };
@@ -143,6 +259,7 @@ function App() {
             <>
                <Notification
                   message={notification.message}
+                  type={notification.type}
                   className={notification.active && "active"}
                />
 
@@ -156,6 +273,8 @@ function App() {
                               return <Redirect to="/medecin" />;
                            } else if (user.type === "secretaire") {
                               return <Redirect to="/secretaire" />;
+                           } else if (user.type === "patient") {
+                              return <Redirect to="/patient" />;
                            }
                         } else {
                            return <Redirect to="/login" />;
@@ -175,15 +294,21 @@ function App() {
                   />
                   <ProtectedRoute
                      path="/secretaire"
-                     type="medecin"
+                     type="secretaire"
                      component={secretaireRoute}
                   />
-                  <Route path="/admin" component={adminRoute} />
                   <ProtectedRoute
                      path="/medecin"
                      type="medecin"
                      component={MedecinRoute}
                   />
+                  <ProtectedRoute
+                     path="/patient"
+                     type="patient"
+                     component={PatientRoute}
+                  />
+
+                  <Route path="/admin" component={adminRoute} />
 
                   <Route path="*" component={NotFound} />
                </Switch>

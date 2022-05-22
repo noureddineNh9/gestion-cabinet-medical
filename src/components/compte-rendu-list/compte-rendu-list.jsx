@@ -4,12 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import audio1 from "../../assets/audio/audio1.mp3";
 import Modal from "../utils/modal__1/modal__1.component";
 import {
-   ajouterCompteRendu,
+   deleteAudio,
    deleteCompteRendu,
+   deleteFichier,
+   setCompteRendu,
+   updateCompteRendu,
 } from "../../redux/compteRendu/compteRendu.actions";
+import { BASE_URL } from "../../api/api";
+import AjouterAudioButton from "../AjouterAudioButton";
+import { setNotificationOn } from "../../redux/notification/notification.actions";
 
 function CompteRenduList({ idConsultation }) {
-   const formElement = useRef();
+   const compteRenduForm = useRef();
    const collapseList = useRef();
 
    const dispatch = useDispatch();
@@ -32,13 +38,12 @@ function CompteRenduList({ idConsultation }) {
    // -------------------------------------------------------------
 
    const initializeForm = () => {
-      formElement.current
+      compteRenduForm.current
          .querySelectorAll("input, textarea")
          .forEach((elem) => {
             elem.value = "";
          });
-
-      formElement.current.idConsultation.value = idConsultation;
+      compteRenduForm.current.idConsultation.value = idConsultation;
    };
 
    useEffect(() => {
@@ -64,92 +69,149 @@ function CompteRenduList({ idConsultation }) {
       });
    }, []);
 
-   const addCompteRendu = (formData) => {
-      const compteRenduForm = new FormData();
-      compteRenduForm.append("idConsultation", formData.get("idConsultation"));
-      compteRenduForm.append("nom", formData.get("compteRenduNom"));
-      compteRenduForm.append(
-         "description",
-         formData.get("compteRenduDescription")
-      );
-      compteRenduForm.append("fichier", formData.get("compteRenduFichier"));
-
-      //send the request
-
-      // ......
-
-      //data from response
-      let compteRendu = {
-         ...Object.fromEntries(compteRenduForm),
-         idCompteRendu: Math.ceil(Math.random() * 10000),
-      };
-
-      let audio = null;
-      if (formData.get("audio").size) {
-         const audioForm = new FormData();
-         audioForm.append("nom", formData.get("audioNom"));
-         audioForm.append("description", formData.get("audioDescription"));
-         audioForm.append("fichier", formData.get("audio"));
-
-         //send the request
-
-         // ......
-
-         //data from response
-         audio = {
-            ...Object.fromEntries(audioForm),
-            idAudio: Math.ceil(Math.random() * 10000),
-         };
-      }
-
-      compteRendu = { ...compteRendu, audio };
-
-      // add in redux store
-      dispatch(ajouterCompteRendu(compteRendu));
-   };
-
-   const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
       e.preventDefault();
+      const compteRenduFormData = new FormData(compteRenduForm.current);
 
-      const formData = new FormData(e.target);
-
-      if (formData.get("idCompteRendu")) {
+      if (compteRenduFormData.get("idCompteRendu")) {
          console.log("update");
+
+         try {
+            const res = await fetch(BASE_URL + "/api/compte-rendu/put.php", {
+               method: "post",
+               body: compteRenduFormData,
+            });
+
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(updateCompteRendu(data));
+               dispatch(
+                  setNotificationOn({
+                     time: 3000,
+                     message: "compte rendu modifié ",
+                  })
+               );
+               hideModal();
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
       } else {
-         addCompteRendu(formData);
+         try {
+            const res = await fetch(BASE_URL + "/api/compte-rendu/post.php", {
+               method: "post",
+               body: compteRenduFormData,
+            });
+
+            if (res.status === 200) {
+               const data = await res.json();
+               hideModal();
+               dispatch(
+                  setNotificationOn({
+                     time: 3000,
+                     message: "compte rendu ajouté ",
+                  })
+               );
+               dispatch(setCompteRendu(data));
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
       }
    };
 
-   const onDeleteCompteRendu = (id) => {
+   const onDeleteCompteRendu = async (id) => {
       const confirm = window.confirm("Vous voulez vraiment le supprimer ?");
       if (confirm) {
-         //delete from database
-         // ......
+         try {
+            const res = await fetch(
+               BASE_URL + "/api/compte-rendu/delete.php?id=" + id
+            );
 
-         dispatch(deleteCompteRendu({ idCompteRendu: id }));
+            if (res.status === 200) {
+               dispatch(deleteCompteRendu({ idCompteRendu: id }));
+               dispatch(
+                  setNotificationOn({
+                     time: 3000,
+                     message: "supprimé avec succès",
+                  })
+               );
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
       }
    };
 
-   const onUpdateCompteRendu = (id) => {
-      let compteRendu = comptesRendu.filter((c) => c.idCompteRendu == id)[0];
-
-      formElement.current.idCompteRendu.value = compteRendu.idCompteRendu;
-      formElement.current.compteRenduNom.value = compteRendu.nom;
-      formElement.current.compteRenduDescription.value =
-         compteRendu.description;
-
-      if (compteRendu.audio) {
-         formElement.current.idAudio.value = compteRendu.audio.idAudio;
-         formElement.current.audioNom.value = compteRendu.audio.nom;
-         formElement.current.audioDescription.value =
-            compteRendu.audio.description;
-      }
+   const onUpdateCompteRendu = async (compteRendu) => {
+      compteRenduForm.current.idCompteRendu.value = compteRendu.idCompteRendu;
+      compteRenduForm.current.nom.value = compteRendu.nom;
+      compteRenduForm.current.type.value = compteRendu.type;
+      compteRenduForm.current.description.value = compteRendu.description;
 
       showModal();
    };
 
    const onAjouterCompteRendu = () => {
       showModal();
+   };
+
+   const onDeleteAudio = async (id) => {
+      try {
+         const res = await fetch(BASE_URL + "/api/audio/delete.php?id=" + id);
+
+         if (res.status === 200) {
+            dispatch(deleteAudio({ idAudio: id }));
+            dispatch(
+               setNotificationOn({ time: 3000, message: "audio supprimé" })
+            );
+         }
+      } catch (error) {
+         console.log("erreur");
+      }
+   };
+
+   const onDeleteFichier = async (id) => {
+      try {
+         const res = await fetch(
+            BASE_URL + "/api/compte-rendu/deleteFichier.php?id=" + id
+         );
+
+         if (res.status === 200) {
+            dispatch(deleteFichier({ idCompteRendu: id }));
+            dispatch(
+               setNotificationOn({ time: 3000, message: "fichier supprimé" })
+            );
+         }
+      } catch (error) {
+         console.log("erreur");
+      }
+   };
+
+   const onAjouteFichier = async (e, idCompteRendu) => {
+      const formData = new FormData();
+      formData.append("idCompteRendu", idCompteRendu);
+      formData.append("fichier", e.target.files[0]);
+
+      console.log(Object.fromEntries(formData));
+      try {
+         const res = await fetch(
+            BASE_URL + "/api/compte-rendu/ajouteFichier.php",
+            {
+               method: "post",
+               body: formData,
+            }
+         );
+         if (res.status === 200) {
+            const data = await res.json();
+            dispatch(updateCompteRendu(data));
+            dispatch(
+               setNotificationOn({ time: 3000, message: "fichier ajouté" })
+            );
+         }
+      } catch (error) {
+         console.log("erreur");
+      }
    };
 
    return (
@@ -163,7 +225,6 @@ function CompteRenduList({ idConsultation }) {
                ajouter
             </button>
          </div>
-
          <div data-id="1" className="collapse-desc ">
             <table className="table__1 mb-16">
                <thead>
@@ -178,35 +239,65 @@ function CompteRenduList({ idConsultation }) {
                   {comptesRendu.map((c) => (
                      <tr key={c.idCompteRendu}>
                         <td>{c.nom}</td>
-                        <td className="w-48 h-32">
-                           <div className="">
+                        <td className=" h-32">
+                           <div className="flex">
                               {c.audio ? (
-                                 <audio
-                                    className=""
-                                    controls
-                                    src={audio1}
-                                 ></audio>
+                                 <>
+                                    <audio
+                                       className=""
+                                       controls
+                                       src={BASE_URL + c.audio.url}
+                                    ></audio>
+                                    <button
+                                       onClick={() =>
+                                          onDeleteAudio(c.audio.idAudio)
+                                       }
+                                       className="text-4xl text-gray-800 ml-4"
+                                    >
+                                       &#x2715;
+                                    </button>
+                                 </>
                               ) : (
-                                 <span>pas de audio</span>
+                                 <span>
+                                    <AjouterAudioButton
+                                       className="lien"
+                                       idCompteRendu={c.idCompteRendu}
+                                    />
+                                 </span>
                               )}
                            </div>
                         </td>
                         <td>
-                           {c.fichier ? (
-                              <i className="text-4xl far fa-file-pdf"></i>
+                           {c.url ? (
+                              <>
+                                 <a href={BASE_URL + c.url} target="_blank">
+                                    <i className="text-5xl text-gray-700 far fa-file-alt"></i>
+                                 </a>
+                                 <button
+                                    onClick={() =>
+                                       onDeleteFichier(c.idCompteRendu)
+                                    }
+                                    className="text-4xl text-gray-800 ml-4"
+                                 >
+                                    &#x2715;
+                                 </button>
+                              </>
                            ) : (
-                              <a href="" className="lien">
-                                 ajouter un fichier
-                              </a>
+                              <>
+                                 {/* <i class="fas fa-file-upload mr-2 text-3xl"></i> */}
+                                 <input
+                                    type="file"
+                                    onChange={(e) =>
+                                       onAjouteFichier(e, c.idCompteRendu)
+                                    }
+                                    className="file__input w-60"
+                                 />
+                              </>
                            )}
                         </td>
                         <td>
                            <div className="flex justify-around items-end">
-                              <button
-                                 onClick={() =>
-                                    onUpdateCompteRendu(c.idCompteRendu)
-                                 }
-                              >
+                              <button onClick={() => onUpdateCompteRendu(c)}>
                                  <i className="text-4xl far fa-edit edit__icon"></i>
                               </button>
                               <button
@@ -234,57 +325,37 @@ function CompteRenduList({ idConsultation }) {
          >
             <div>
                <form
-                  id="compte-rendu-form"
                   className="form__1"
+                  ref={compteRenduForm}
                   onSubmit={handleSubmit}
-                  ref={formElement}
                >
                   <input
                      type="number"
                      name="idConsultation"
                      defaultValue={idConsultation}
+                     hidden
                   />
-                  <input type="number" name="idCompteRendu" />
+                  <input type="number" name="idCompteRendu" hidden />
                   <div className="w-full">
-                     <label htmlFor="compteRenduNom">
-                        nom de compte rendu :
-                     </label>
-                     <input type="text" name="compteRenduNom" />
+                     <label htmlFor="nom">nom de compte rendu :</label>
+                     <input type="text" name="nom" />
+                  </div>
+                  <div className="w-full">
+                     <label htmlFor="type">type :</label>
+                     <input type="text" name="type" />
                   </div>
                   <div className="w-full">
                      <label htmlFor="email">description :</label>
-                     <textarea
-                        name="compteRenduDescription"
-                        rows={4}
-                     ></textarea>
-                  </div>
-                  <div className="w-full">
-                     <label htmlFor="email">
-                        fichier ( *.pdf, *.doc, *.docx ) :
-                     </label>
-                     <input type="file" name="compteRenduFichier" />
+                     <textarea name="description" rows={4}></textarea>
                   </div>
                   <hr />
-                  <h3>audio </h3>
                   <br />
-                  <input type="number" name="idAudio" />
-                  <div className="w-full">
-                     <label htmlFor="email">nom :</label>
-                     <input type="text" name="audioNom" />
-                  </div>
-                  <div className="w-full">
-                     <label htmlFor="email">description :</label>
-                     <textarea name="audioDescription" rows={4}></textarea>
-                  </div>
-                  <div className="w-full">
-                     <label htmlFor="email">audio ( *.mp3, *.m4a ) :</label>
-                     <input type="file" name="audio" />
-                  </div>
-
                   <button className="button__1" type="submit">
                      Ajouter
                   </button>
                </form>
+
+               <br />
             </div>
          </Modal>
       </div>

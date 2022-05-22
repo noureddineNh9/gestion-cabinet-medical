@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
+import { BASE_URL } from "../../api/api";
 import { setCurrentUser } from "../../redux/user/user.actions";
 import "./login.styles.scss";
 
@@ -11,36 +12,39 @@ function Login() {
    const dispatch = useDispatch();
    const history = useHistory();
 
-   const onLogin = (e) => {
+   const onLogin = async (e) => {
       e.preventDefault();
 
       const formData = new FormData(e.target);
-      const email = formData.get("email");
+      const login = formData.get("login");
       const password = formData.get("password");
 
-      const randomUser = {
-         idUtilisateur: 155,
-         cin: "BE44564",
-         nom: "prof ",
-         prenom: "koubi",
-         email: "koubi@mail.com",
-         situationFamilliale: "celibataire",
-         genre: "male",
-         tel: "09876543245",
-         adresse: "dsqsdqdsqd",
-         imageProfile: "/uploads/images/625b52a7c88b4.jpg",
-      };
+      try {
+         const res = await fetch(BASE_URL + "/api/login.php", {
+            method: "post",
+            body: formData,
+         });
 
-      if (email === "medecin") {
-         dispatch(setCurrentUser({ currentUser: randomUser, type: "medecin" }));
+         if (res.status === 200) {
+            const user = await res.json();
+            console.log(user);
+            dispatch(setCurrentUser({ currentUser: user, type: user.type }));
+            history.push("/");
+         } else {
+            throw new Error();
+         }
+      } catch (error) {}
 
-         history.push("/");
-      } else if (email === "secretaire") {
-         history.push("/");
-         dispatch(
-            setCurrentUser({ currentUser: randomUser, type: "secretaire" })
-         );
-      }
+      // if (email === "medecin") {
+      //    dispatch(setCurrentUser({ currentUser: randomUser, type: "medecin" }));
+
+      //    history.push("/");
+      // } else if (email === "secretaire") {
+      //    history.push("/");
+      //    dispatch(
+      //       setCurrentUser({ currentUser: randomUser, type: "secretaire" })
+      //    );
+      // }
    };
 
    return (
@@ -50,12 +54,12 @@ function Login() {
                <h2 className="text-center mb-12">Cabinet Médical</h2>
 
                <div>
-                  <label htmlFor="email">email</label>
-                  <input type="text" name="email" id="" />
+                  <label htmlFor="login">login</label>
+                  <input type="text" name="login" />
                </div>
                <div className="">
-                  <label htmlFor="email">password</label>
-                  <input type="password" name="password" id="" />
+                  <label htmlFor="motDePasse">mot de passe</label>
+                  <input type="password" name="motDePasse" />
                </div>
                <div className="mb-8">
                   <a className="lien font-light" href="">

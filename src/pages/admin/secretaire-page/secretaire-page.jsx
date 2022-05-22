@@ -7,16 +7,22 @@ import defaultImageProfile from "../../../assets/images/default-img-profile.jpg"
 
 import "./secretaire-page.styles.scss";
 import ReactPaginate from "react-paginate";
+import UpdatePassword from "../components/UpdatePassword";
+import { useDispatch, useSelector } from "react-redux";
+import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
+import {
+   ajouterSecretaire,
+   deleteSecretaire,
+   updateSecretaire,
+} from "../../../redux/secretaire/secretaire.actions";
 
 function SecretairePage() {
-   const [SecretaireData, setSecretaireData] = useState([]);
    const [filteredData, setFilteredData] = useState([]);
-   const [pageData, setPageData] = useState([]);
-
-   // const [currentPage, setCurrentPage] = useState(1);
-   const [itemsPerPage, setItemsPerPage] = useState(5);
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
+
+   const SecretaireData = useSelector((state) => state.secretaire);
+   const dispatch = useDispatch();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -32,20 +38,8 @@ function SecretairePage() {
    };
 
    useEffect(() => {
-      paginate(1);
-   }, [filteredData]);
-
-   useEffect(() => {
-      initializeForm();
-      loadData();
-   }, []);
-
-   const loadData = async () => {
-      const res = await fetch(`${BASE_URL}/api/secretaire/getAll.php`);
-      const data = await res.json();
-      setSecretaireData(data);
-      setFilteredData(data);
-   };
+      setFilteredData(SecretaireData);
+   }, [SecretaireData]);
 
    const handleSubmit = (e) => {
       e.preventDefault();
@@ -60,24 +54,7 @@ function SecretairePage() {
                return res.json();
             })
             .then((data) => {
-               setSecretaireData(
-                  SecretaireData.map((m) => {
-                     if (m.idUtilisateur == idUtilisateur) {
-                        return data;
-                     } else {
-                        return m;
-                     }
-                  })
-               );
-               setFilteredData(
-                  SecretaireData.map((m) => {
-                     if (m.idUtilisateur == idUtilisateur) {
-                        return data;
-                     } else {
-                        return m;
-                     }
-                  })
-               );
+               dispatch(updateSecretaire(data));
                initializeForm();
             })
             .catch((err) => {});
@@ -94,8 +71,8 @@ function SecretairePage() {
                }
             })
             .then((data) => {
-               setSecretaireData([...SecretaireData, data]);
-               setFilteredData([...SecretaireData, data]);
+               dispatch(ajouterSecretaire(data));
+
                initializeForm();
             })
             .catch((err) => {});
@@ -114,12 +91,7 @@ function SecretairePage() {
          fetch(`${BASE_URL}/api/secretaire/delete.php?id=${id}`)
             .then((res) => res.json())
             .then((data) => {
-               setSecretaireData(
-                  SecretaireData.filter((p) => p.idUtilisateur != id)
-               );
-               setFilteredData(
-                  SecretaireData.filter((p) => p.idUtilisateur != id)
-               );
+               dispatch(deleteSecretaire({ idUtilisateur: id }));
             });
       }
    };
@@ -175,21 +147,57 @@ function SecretairePage() {
       }
    };
 
-   const paginate = (currentPage) => {
-      const indexOfLastEmployee = currentPage * itemsPerPage;
-      const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-      const currentData = filteredData.slice(
-         indexOfFirstEmployee,
-         indexOfLastEmployee
-      );
+   const columns = [
+      {
+         name: "cin",
+         selector: (row) => row.cin,
+         sortable: true,
+         maxWidth: "150px",
+      },
+      {
+         name: "profile",
+         selector: (row) => (
+            <div className="py-4">
+               <img
+                  className="h-20 w-20 object-cover rounded-full border"
+                  src={BASE_URL + row.imageProfile}
+                  alt=""
+               />
+            </div>
+         ),
+         sortable: true,
+         maxWidth: "150px",
 
-      setPageData(currentData);
-   };
-   const countPages = Math.ceil(filteredData.length / itemsPerPage);
-   const handlePageClick = (e) => {
-      paginate(e.selected + 1);
-   };
-
+         style: {
+            margin: "flex",
+            justifyContent: "space-around",
+         },
+      },
+      {
+         name: "nom complet",
+         selector: (row) => row.nom + " " + row.prenom,
+         sortable: true,
+      },
+      {
+         name: "",
+         cell: (row) => (
+            <>
+               <UpdatePassword idUtilisateur={row.idUtilisateur} />
+               <button onClick={() => onUpdate(row.idUtilisateur)}>
+                  <i className="text-4xl far fa-edit edit__icon"></i>
+               </button>
+               <button onClick={() => onDelete(row.idUtilisateur)}>
+                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
+               </button>
+            </>
+         ),
+         width: "150px",
+         style: {
+            display: "flex",
+            justifyContent: "space-around",
+         },
+      },
+   ];
    return (
       <div className="p-8">
          <div className="flex justify-between mb-8">
@@ -214,59 +222,13 @@ function SecretairePage() {
          <hr />
          <br />
          <div>
-            <table className="table__1 ">
-               <thead>
-                  <tr>
-                     <th>cin</th>
-                     <th>profile</th>
-                     <th>nom</th>
-                     <th>prenom</th>
-                     <th></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {pageData.map((m, index) => (
-                     <tr key={index}>
-                        <td>{m.cin}</td>
-                        <td>
-                           <img
-                              className="h-20 w-20 object-cover rounded-full border"
-                              src={BASE_URL + m.imageProfile}
-                              alt=""
-                           />
-                        </td>
-                        <td>{m.nom}</td>
-                        <td>{m.prenom}</td>
-                        <td>
-                           <div className="flex justify-around items-end">
-                              <button onClick={() => onUpdate(m.idUtilisateur)}>
-                                 <i className="text-4xl far fa-edit edit__icon"></i>
-                              </button>
-                              <button onClick={() => onDelete(m.idUtilisateur)}>
-                                 <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                              </button>
-                           </div>
-                        </td>
-                     </tr>
-                  ))}
-               </tbody>
-            </table>
-
-            <div className="flex justify-center">
-               <ReactPaginate
-                  previousLabel={<i className="fas fa-angle-double-left"></i>}
-                  nextLabel={<i className="fas fa-angle-double-right"></i>}
-                  breakLabel={"..."}
-                  breakClassName={"break-me"}
-                  pageCount={countPages}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  onPageChange={handlePageClick}
-                  containerClassName={"pagination"}
-                  subContainerClassName={"pages pagination"}
-                  activeClassName={"active"}
-               />
-            </div>
+            <MyDataTable
+               columns={columns}
+               data={filteredData}
+               // defaultSortField="idElement"
+               striped
+               pagination
+            />
          </div>
 
          {/* *******************************  Modal  *************************************** */}

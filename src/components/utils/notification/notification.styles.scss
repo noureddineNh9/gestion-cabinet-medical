@@ -10,10 +10,18 @@
       rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
 
    z-index: 100;
-   background: #f6eb8b;
 
    &.active {
       right: 20px;
+   }
+
+   &.default {
+      background: #f6eb8b;
+   }
+
+   &.error {
+      background: #e66b6b;
+      color: white;
    }
 
    .notification__message {

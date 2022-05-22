@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useRouteMatch } from "react-router-dom";
 import { Link, Route, Switch } from "react-router-dom";
 import Antecedents from "../antecedents/antecedents.component";
 import ConsultationList from "../consultation-list/consultation-list";
@@ -7,11 +8,13 @@ import ConsultationList from "../consultation-list/consultation-list";
 import Consultation from "../consultation/consultation.component";
 import DossierAdministratif from "../dossier-administratif/dossier-administratif.component";
 import ElementSanteList from "../element-sante-list/element-sante-list";
+import ElementSante from "../element-sante/element-sante.component";
 
 import "./dossier-patient.styles.scss";
 
 function DossierPatient(props) {
-   const idPatient = props.match.params.id;
+   const match = useRouteMatch();
+   const idPatient = match.params.id;
    const patient = useSelector((state) => {
       return state.patient.filter((p) => p.idUtilisateur == idPatient)[0];
    });
@@ -54,7 +57,7 @@ function DossierPatient(props) {
       <div>
          <div id="dossier-sidebar" className="sidebar h-screen">
             <div className="p-8">
-               <Link to="/secretaire" className="lien__2">
+               <Link to="/" className="lien__2">
                   <i className="far fa-hand-point-left"></i>page d'accueil
                </Link>
             </div>
@@ -67,25 +70,22 @@ function DossierPatient(props) {
             </div>
             <ul className="menu">
                <li>
-                  <Link to={`${props.match.url}`} className="link active">
+                  <Link to={`${match.url}`} className="link active">
                      Dossier Administratif
                   </Link>
                </li>
                <li>
-                  <Link to={`${props.match.url}/consultation`} className="link">
+                  <Link to={`${match.url}/consultation`} className="link">
                      Consultations
                   </Link>
                </li>
                <li>
-                  <Link to={`${props.match.url}/antecedents`} className="link">
+                  <Link to={`${match.url}/antecedents`} className="link">
                      Antecedents
                   </Link>
                </li>
                <li>
-                  <Link
-                     to={`${props.match.url}/element-sante`}
-                     className="link"
-                  >
+                  <Link to={`${match.url}/element-sante`} className="link">
                      Elements santé
                   </Link>
                </li>
@@ -95,31 +95,37 @@ function DossierPatient(props) {
             <Switch>
                <Route
                   exact
-                  path={`${props.match.url}`}
+                  path={`${match.url}`}
                   component={() => <DossierAdministratif patient={patient} />}
                />
                <Route
                   exact
-                  path={`${props.match.url}/consultation`}
+                  path={`${match.url}/consultation`}
                   component={(props) => (
                      <ConsultationList
                         consultations={consultations}
+                        mode="read"
                         {...props}
                      />
                   )}
                />
                <Route
-                  path={`${props.match.url}/consultation/:id`}
+                  path={`${match.url}/consultation/:id`}
                   component={Consultation}
                />
                <Route
                   exact
-                  path={`${props.match.url}/antecedents`}
-                  component={Antecedents}
+                  path={`${match.url}/antecedents`}
+                  component={() => <Antecedents idPatient={idPatient} />}
                />
                <Route
-                  path={`${props.match.url}/element-sante`}
+                  exact
+                  path={`${match.url}/element-sante`}
                   component={() => <ElementSanteList idPatient={idPatient} />}
+               />
+               <Route
+                  path={`${match.url}/element-sante/:id`}
+                  component={ElementSante}
                />
             </Switch>
             <br />

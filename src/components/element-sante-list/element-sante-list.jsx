@@ -6,18 +6,13 @@ import {
    ajouterElementSante,
    deleteElementSante,
 } from "../../redux/elementSante/elementSante.actions";
-import ConsultationList from "../consultation-list/consultation-list";
-import Consultation from "../consultation/consultation.component";
-import ElementSante from "../element-sante/element-sante.component";
 import Modal from "../utils/modal__1/modal__1.component";
 import MyDataTable from "../utils/my-data-table/my-data-table";
-
-import { createStructuredSelector } from "reselect";
 
 import "./element-sante-list.scss";
 import { selectElementSanteByPatient } from "../../redux/elementSante/elementSante.selectors";
 
-const Index = ({ idPatient }) => {
+function ElementSanteList({ idPatient }) {
    const [filteredItems, setFilteredItems] = useState([]);
    const [searchInputValue, setSearchInputValue] = useState("");
    const [Operation, setOperation] = useState("Ajouter");
@@ -214,22 +209,6 @@ const Index = ({ idPatient }) => {
             </div>
          </Modal>
       </div>
-   );
-};
-
-function ElementSanteList({ idPatient }) {
-   const match = useRouteMatch();
-
-   return (
-      <Switch>
-         <Route
-            exact
-            path={`${match.url}`}
-            component={() => <Index idPatient={idPatient} />}
-         />
-
-         <Route path={`${match.url}/:id`} component={ElementSante} />
-      </Switch>
    );
 }
 

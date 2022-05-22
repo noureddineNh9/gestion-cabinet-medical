@@ -6,32 +6,23 @@ import Modal from "../../../components/utils/modal__1/modal__1.component";
 import defaultImageProfile from "../../../assets/images/default-img-profile.jpg";
 
 import "./medecin-page.styles.scss";
-import ReactPaginate from "react-paginate";
-
-const medecinFormValue = {
-   idPatient: "",
-   cne: "",
-   nom: "",
-   prenom: "",
-   email: "",
-   motDePasse: "",
-   genre: "",
-   situationFamilliale: "",
-   tel: "",
-   adresse: "",
-   imageProfile: "",
-   hauteur: "",
-};
+import UpdatePassword from "../components/UpdatePassword";
+import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
+import { useDispatch, useSelector } from "react-redux";
+import {
+   ajouterMedecin,
+   deleteMedecin,
+   updateMedecin,
+} from "../../../redux/medecin/medecin.actions";
 
 function MedecinPage() {
-   const [medecins, setMedecins] = useState([]);
    const [filteredData, setFilteredData] = useState([]);
-   const [pageData, setPageData] = useState([]);
-
-   // const [currentPage, setCurrentPage] = useState(1);
-   const [itemsPerPage, setItemsPerPage] = useState(5);
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
+
+   const MedecinData = useSelector((state) => state.medecin);
+   const ServiceData = useSelector((state) => state.service);
+   const dispatch = useDispatch();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -42,26 +33,12 @@ function MedecinPage() {
    const hideModal = () => {
       setModalActive(false);
       document.querySelector("body").classList.remove("modal__active");
-
       initializeForm();
    };
 
    useEffect(() => {
-      paginate(1);
-   }, [filteredData]);
-
-   useEffect(() => {
-      console.log(medecins);
-      initializeForm();
-      loadData();
-   }, []);
-
-   const loadData = async () => {
-      const res = await fetch(`${BASE_URL}/api/medecin/getAll.php`);
-      const data = await res.json();
-      setMedecins(data);
-      setFilteredData(data);
-   };
+      setFilteredData(MedecinData);
+   }, [MedecinData]);
 
    const handleSubmit = (e) => {
       e.preventDefault();
@@ -74,28 +51,15 @@ function MedecinPage() {
             body: formData,
          })
             .then((res) => {
-               return res.json();
+               if (res.status === 200) {
+                  return res.json();
+               } else {
+                  throw Error;
+               }
             })
             .then((data) => {
                console.log(data);
-               setMedecins(
-                  medecins.map((m) => {
-                     if (m.idUtilisateur == idUtilisateur) {
-                        return data;
-                     } else {
-                        return m;
-                     }
-                  })
-               );
-               setFilteredData(
-                  medecins.map((m) => {
-                     if (m.idUtilisateur == idUtilisateur) {
-                        return data;
-                     } else {
-                        return m;
-                     }
-                  })
-               );
+               dispatch(updateMedecin(data));
                initializeForm();
             })
             .catch((err) => {});
@@ -112,9 +76,8 @@ function MedecinPage() {
                }
             })
             .then((data) => {
-               setMedecins([...medecins, data]);
-               setFilteredData([...medecins, data]);
                initializeForm();
+               dispatch(ajouterMedecin(data));
             })
             .catch((err) => {});
       }
@@ -125,7 +88,6 @@ function MedecinPage() {
    };
 
    const onDeleteMedecin = (id) => {
-      console.log(medecins);
       const resultat = window.confirm(
          "are you sure you want to delete this record"
       );
@@ -133,8 +95,7 @@ function MedecinPage() {
          fetch(`${BASE_URL}/api/medecin/delete.php?id=${id}`)
             .then((res) => res.json())
             .then((data) => {
-               setMedecins(medecins.filter((p) => p.idUtilisateur != id));
-               setFilteredData(medecins.filter((p) => p.idUtilisateur != id));
+               dispatch(deleteMedecin({ idUtilisateur: id }));
             });
       }
    };
@@ -143,12 +104,13 @@ function MedecinPage() {
       setModalActive(true);
 
       const form = document.querySelector("#medecinForm");
-      const medecin = medecins.filter((p) => p.idUtilisateur === id)[0];
+      const medecin = MedecinData.filter((p) => p.idUtilisateur === id)[0];
       console.log(medecin);
 
       setPreviewImage(BASE_URL + medecin.imageProfile);
 
       form.idUtilisateur.value = medecin.idUtilisateur;
+      form.idService.value = medecin.idService;
       form.nom.value = medecin.nom;
       form.prenom.value = medecin.prenom;
       form.cin.value = medecin.cin;
@@ -163,7 +125,7 @@ function MedecinPage() {
    const onSearchMedecin = (e) => {
       const mot = e.target.value;
       setFilteredData(
-         medecins.filter(
+         MedecinData.filter(
             (m) =>
                m.cin.toLowerCase().includes(mot.toLowerCase()) ||
                m.nom.toLowerCase().includes(mot.toLowerCase()) ||
@@ -191,20 +153,57 @@ function MedecinPage() {
       }
    };
 
-   const paginate = (currentPage) => {
-      const indexOfLastEmployee = currentPage * itemsPerPage;
-      const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-      const currentData = filteredData.slice(
-         indexOfFirstEmployee,
-         indexOfLastEmployee
-      );
+   const columns = [
+      {
+         name: "cin",
+         selector: (row) => row.cin,
+         sortable: true,
+         maxWidth: "150px",
+      },
+      {
+         name: "profile",
+         selector: (row) => (
+            <div className="py-4">
+               <img
+                  className="h-20 w-20 object-cover rounded-full border"
+                  src={BASE_URL + row.imageProfile}
+                  alt=""
+               />
+            </div>
+         ),
+         sortable: true,
+         maxWidth: "150px",
 
-      setPageData(currentData);
-   };
-   const countPages = Math.ceil(filteredData.length / itemsPerPage);
-   const handlePageClick = (e) => {
-      paginate(e.selected + 1);
-   };
+         style: {
+            margin: "flex",
+            justifyContent: "space-around",
+         },
+      },
+      {
+         name: "nom complet",
+         selector: (row) => row.nom + " " + row.prenom,
+         sortable: true,
+      },
+      {
+         name: "",
+         cell: (row) => (
+            <>
+               <UpdatePassword idUtilisateur={row.idUtilisateur} />
+               <button onClick={() => onUpdateMedecin(row.idUtilisateur)}>
+                  <i className="text-4xl far fa-edit edit__icon"></i>
+               </button>
+               <button onClick={() => onDeleteMedecin(row.idUtilisateur)}>
+                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
+               </button>
+            </>
+         ),
+         width: "150px",
+         style: {
+            display: "flex",
+            justifyContent: "space-around",
+         },
+      },
+   ];
 
    return (
       <div className="p-8">
@@ -230,67 +229,13 @@ function MedecinPage() {
          <hr />
          <br />
          <div>
-            <table className="table__1 ">
-               <thead>
-                  <tr>
-                     <th>cin</th>
-                     <th>profile</th>
-                     <th>nom</th>
-                     <th>prenom</th>
-                     <th></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {pageData.map((m, index) => (
-                     <tr key={index}>
-                        <td>{m.cin}</td>
-                        <td>
-                           <img
-                              className="h-20 w-20 object-cover rounded-full border"
-                              src={BASE_URL + m.imageProfile}
-                              alt=""
-                           />
-                        </td>
-                        <td>{m.nom}</td>
-                        <td>{m.prenom}</td>
-                        <td>
-                           <div className="flex justify-around items-end">
-                              <button
-                                 onClick={() =>
-                                    onUpdateMedecin(m.idUtilisateur)
-                                 }
-                              >
-                                 <i className="text-4xl far fa-edit edit__icon"></i>
-                              </button>
-                              <button
-                                 onClick={() =>
-                                    onDeleteMedecin(m.idUtilisateur)
-                                 }
-                              >
-                                 <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                              </button>
-                           </div>
-                        </td>
-                     </tr>
-                  ))}
-               </tbody>
-            </table>
-
-            <div className="flex justify-center">
-               <ReactPaginate
-                  previousLabel={<i className="fas fa-angle-double-left"></i>}
-                  nextLabel={<i className="fas fa-angle-double-right"></i>}
-                  breakLabel={"..."}
-                  breakClassName={"break-me"}
-                  pageCount={countPages}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  onPageChange={handlePageClick}
-                  containerClassName={"pagination"}
-                  subContainerClassName={"pages pagination"}
-                  activeClassName={"active"}
-               />
-            </div>
+            <MyDataTable
+               columns={columns}
+               data={filteredData}
+               // defaultSortField="idElement"
+               striped
+               pagination
+            />
          </div>
 
          {/* *******************************  Modal  *************************************** */}
@@ -348,6 +293,16 @@ function MedecinPage() {
                         </label>
                         <input type="date" name="dateNaissance" />
                      </div>
+                  </div>
+                  <div className="w-full">
+                     <label>service :</label>
+                     <select name="idService">
+                        {ServiceData.map((s) => (
+                           <option key={s.idService} value={s.idService}>
+                              {s.nom}
+                           </option>
+                        ))}
+                     </select>
                   </div>
                   <div className="flex gap-6 mb-4">
                      <div className="w-full">

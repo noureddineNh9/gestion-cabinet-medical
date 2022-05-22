@@ -2,14 +2,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { BASE_URL } from "../../../api/api";
 import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
 import Modal from "../../../components/utils/modal__1/modal__1.component";
+import {
+   ajouterService,
+   deleteService,
+   updateService,
+} from "../../../redux/service/service.actions";
+import { useDispatch, useSelector } from "react-redux";
 
 function ServicePage() {
    const [filteredItems, setFilteredItems] = useState([]);
-   const [ServiceData, setServiceData] = useState([]);
    const [searchInputValue, setSearchInputValue] = useState("");
    const [Operation, setOperation] = useState("Ajouter");
 
+   const ServiceData = useSelector((state) => state.service);
+
    const formElement = useRef();
+   const dispatch = useDispatch();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -54,20 +62,12 @@ function ServicePage() {
    ];
 
    useEffect(() => {
-      console.log(ServiceData);
       setFilteredItems(
          ServiceData.filter((m) =>
             m.nom.toLowerCase().includes(searchInputValue.toLowerCase())
          )
       );
    }, [searchInputValue, ServiceData]);
-   useEffect(() => {
-      fetch(BASE_URL + "/api/service/getAll.php")
-         .then((res) => res.json())
-         .then((data) => {
-            setServiceData(data);
-         });
-   }, []);
 
    const initializeForm = () => {
       formElement.current.idService.value = "";
@@ -77,6 +77,7 @@ function ServicePage() {
    const handleSubmit = async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
+      const formJson = Object.fromEntries(formData);
 
       if (formData.get("idService") == "") {
          //ajouter
@@ -88,7 +89,7 @@ function ServicePage() {
 
             if (res.status === 200) {
                const data = await res.json();
-               setServiceData([...ServiceData, data]);
+               dispatch(ajouterService(data));
                hideModal();
             }
          } catch (error) {
@@ -96,7 +97,20 @@ function ServicePage() {
          }
       } else {
          //modifier
-         console.log("modifier");
+         try {
+            const res = await fetch(BASE_URL + "/api/service/put.php", {
+               method: "post",
+               body: formData,
+            });
+
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(updateService(formJson));
+               hideModal();
+            }
+         } catch (error) {
+            console.log("erreur");
+         }
       }
    };
 
@@ -117,7 +131,7 @@ function ServicePage() {
          const res = await fetch(BASE_URL + "/api/service/delete.php?id=" + id);
 
          if (res.status === 200) {
-            setServiceData(ServiceData.filter((i) => i.idService != id));
+            dispatch(deleteService({ idService: id }));
          }
       } catch (error) {
          console.log("erreur");

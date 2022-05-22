@@ -92,3 +92,96 @@
    -webkit-background-clip: text;
    -webkit-text-fill-color: transparent;
 }
+
+/* From uiverse.io by @arghyaBiswasDev */
+/* The switch - the box around the slider */
+.switch {
+   font-size: 17px;
+   position: relative;
+   display: inline-block;
+   width: 3.2em;
+   height: 1.7em;
+
+   input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+   }
+
+   .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #fff;
+      border: 1px solid #adb5bd;
+      transition: 0.4s;
+      border-radius: 30px;
+   }
+
+   .slider:before {
+      position: absolute;
+      content: "";
+      height: 1.1em;
+      width: 1.1em;
+      border-radius: 20px;
+      left: 0.27em;
+      bottom: 0.25em;
+      background-color: #adb5bd;
+      transition: 0.4s;
+   }
+
+   input:checked + .slider {
+      background-color: var(--color-primary-1);
+      border: 1px solid var(--color-primary-1);
+   }
+
+   input:focus + .slider {
+      box-shadow: 0 0 1px var(--color-primary-1);
+   }
+
+   input:checked + .slider:before {
+      transform: translateX(1.4em);
+      background-color: #fff;
+   }
+}
+
+.file__input {
+   color: transparent;
+}
+.file__input::-webkit-file-upload-button {
+   visibility: hidden;
+}
+.file__input::before {
+   content: "ajouter un fichier";
+   color: var(--color-primary-1);
+
+   cursor: pointer;
+
+   font-weight: 500;
+
+   transition: all 0.2s;
+
+   text-decoration: underline;
+}
+.file__input:hover::before {
+   font-weight: 600;
+}
+
+.button__6 {
+   color: var(--color-primary-1);
+
+   cursor: pointer;
+
+   font-weight: 500;
+
+   transition: all 0.2s;
+
+   text-decoration: underline;
+
+   &:hover {
+      font-weight: 600;
+   }
+}
