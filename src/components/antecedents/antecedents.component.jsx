@@ -9,7 +9,7 @@ import {
    deleteAntecedent,
 } from "../../redux/antecedent/antecedent.actions";
 
-const AntecedentItem = ({ item, showModal, formElement }) => {
+const AntecedentItem = ({ item, showModal, formElement, userType }) => {
    const dispatch = useDispatch();
    //   const data = props.item
 
@@ -53,20 +53,22 @@ const AntecedentItem = ({ item, showModal, formElement }) => {
                   <p>{item.description}</p>
                </div>
                <div className="w-max">
-                  <div className="flex justify-end">
-                     <button className="mr-5">
-                        <i
-                           className="text-4xl far fa-edit edit__icon"
-                           onClick={OnUpdate}
-                        ></i>
-                     </button>
-                     <button className="mr-5">
-                        <i
-                           className="text-4xl far fa-trash-alt delete__icon"
-                           onClick={() => Ondelete(item.idAntecedent)}
-                        ></i>
-                     </button>
-                  </div>
+                  {userType === "medecin" && (
+                     <div className="flex justify-end">
+                        <button className="mr-5">
+                           <i
+                              className="text-4xl far fa-edit edit__icon"
+                              onClick={OnUpdate}
+                           ></i>
+                        </button>
+                        <button className="mr-5">
+                           <i
+                              className="text-4xl far fa-trash-alt delete__icon"
+                              onClick={() => Ondelete(item.idAntecedent)}
+                           ></i>
+                        </button>
+                     </div>
+                  )}
                </div>
             </div>
 
@@ -79,7 +81,7 @@ const AntecedentItem = ({ item, showModal, formElement }) => {
    );
 };
 
-function Antecedents({ idPatient }) {
+function Antecedents({ idPatient, userType }) {
    const formElement = useRef();
    const [modalActive, setModalActive] = useState(false);
    const dispatch = useDispatch();
@@ -185,11 +187,13 @@ function Antecedents({ idPatient }) {
       <div id="medecinForm">
          <div id="collapse-list">
             {/******************* les diagnostiques audio ************************ */}
-            <div className="flex justify-end mb-8">
-               <button className="button__1 h-auto" onClick={showModal}>
-                  ajouter un antécédent
-               </button>
-            </div>
+            {userType === "medecin" && (
+               <div className="flex justify-end mb-8">
+                  <button className="button__1 h-auto" onClick={showModal}>
+                     ajouter un antécédent
+                  </button>
+               </div>
+            )}
 
             <h3 id="1" className="collapse-item title__1 mb-8">
                ANTÉCÉDENTS MÉDICAUX
@@ -199,6 +203,7 @@ function Antecedents({ idPatient }) {
                   .filter((value) => value.type == "medical")
                   .map((element) => (
                      <AntecedentItem
+                        userType={userType}
                         key={element.idAntecedent}
                         item={element}
                         formElement={formElement}
@@ -218,6 +223,7 @@ function Antecedents({ idPatient }) {
                   .filter((value) => value.type == "psychologue")
                   .map((element) => (
                      <AntecedentItem
+                        userType={userType}
                         key={element.idAntecedent}
                         item={element}
                         formElement={formElement}
@@ -237,6 +243,7 @@ function Antecedents({ idPatient }) {
                   .filter((value) => value.type == "familial")
                   .map((element) => (
                      <AntecedentItem
+                        userType={userType}
                         key={element.idAntecedent}
                         item={element}
                         formElement={formElement}
@@ -249,13 +256,14 @@ function Antecedents({ idPatient }) {
             </div>
 
             <h3 id="4" className="collapse-item title__1 mb-8">
-               ntécédent de traumatisme
+               ANTÉCÉDENTS DE TRAUMATISME
             </h3>
             <div data-id="4" className="collapse-desc">
                {antecedentData
                   .filter((value) => value.type == "traumas")
                   .map((element) => (
                      <AntecedentItem
+                        userType={userType}
                         key={element.idAntecedent}
                         item={element}
                         formElement={formElement}
@@ -267,13 +275,14 @@ function Antecedents({ idPatient }) {
             </div>
 
             <h3 id="5" className="collapse-item title__1 mb-8">
-               Autres
+               AUTRES
             </h3>
             <div data-id="5" className="collapse-desc">
                {antecedentData
                   .filter((value) => value.type == "autre")
                   .map((element) => (
                      <AntecedentItem
+                        userType={userType}
                         key={element.idAntecedent}
                         item={element}
                         formElement={formElement}
@@ -336,7 +345,6 @@ function Antecedents({ idPatient }) {
    );
 }
 export default Antecedents;
-
 // import React, { useEffect } from "react";
 
 // import "./antecedents.styles.scss";

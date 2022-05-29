@@ -8,3 +8,12 @@ export const selectConsultationByMedecin = createSelector(
             c.audio /* && c.audio.idSecretaire == currentUser.idUtilisateur */
       )
 );
+
+// export const selectConsultationByPatient = createSelector(
+//    [(state) => state.consultation, (state, idPatient) => idPatient],
+//    (consultation, idPatient) =>
+//    consultation.filter(
+//          (c) =>
+//             c.audio /* && c.audio.idSecretaire == currentUser.idUtilisateur */
+//       )
+// );

@@ -153,6 +153,19 @@ input:focus {
    }
 }
 
+.input__1 {
+   border: 1px solid transparent;
+   border-radius: 5px;
+   padding: 7px;
+   background-color: rgb(255, 255, 255);
+   outline: none;
+   border: 1px solid var(--color-slate-4);
+   height: 38px;
+   transition: all 0.25s;
+   &:focus {
+      border: 1px solid var(--color-primary-1);
+   }
+}
 .content {
    background-color: var(--color-lightgray-5);
    min-height: 100vh;

@@ -1,9 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Switch, Route } from "react-router-dom";
+import DossierPatient from "../components/dossier-patient/dossier-patient.component";
 import UpdatePasswordPage from "../components/UpdatePasswordPage";
 import NotFound from "../pages/not-found/not-found";
-import Dossier from "../pages/patient/dossier/dossier";
 import HomePage from "../pages/patient/home-page/home-page.component";
 import RendezVous from "../pages/patient/rendez-vous/rendez-vous";
 import Sidebar from "../pages/patient/Sidebar";
@@ -14,7 +14,7 @@ function PatientRoute() {
    return (
       <div className="patient">
          <Switch>
-            <Route path="/patient/dossier/:id" component={Dossier} />
+            <Route path="/patient/dossier/:id" component={DossierPatient} />
             <Route>
                <Sidebar />
                <div className="content p-8">

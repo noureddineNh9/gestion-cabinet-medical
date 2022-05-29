@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
+import LogoutButton from "../../../components/LogoutButton";
 
 const Sidebar = () => {
    useEffect(() => {
@@ -47,9 +48,9 @@ const Sidebar = () => {
                <Link className="link" to="/admin/service">
                   <i className="fas fa-user"></i> Services
                </Link>
-               <a className="link">
+               <LogoutButton className="link">
                   <i className="fas fa-sign-out-alt"></i> log out
-               </a>
+               </LogoutButton>
             </ul>
          </div>
       </>

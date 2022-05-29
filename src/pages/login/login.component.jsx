@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
@@ -7,10 +7,31 @@ import { setCurrentUser } from "../../redux/user/user.actions";
 import "./login.styles.scss";
 
 function Login() {
-   // const [Route, setRoute] = useState("login");
+   const [status, setStatus] = useState("");
+   const [FormErreur, setFormErreur] = useState("");
 
    const dispatch = useDispatch();
    const history = useHistory();
+
+   // useEffect(() => {
+   //    const idSession = localStorage.getItem("idSession");
+
+   //    if (idSession) {
+   //       const formData = new FormData();
+   //       formData.append("idSession", idSession);
+   //       fetch(BASE_URL + "/getSession.php", {
+   //          method: "POST",
+   //          body: formData,
+   //       })
+   //          .then((res) => res.json())
+   //          .then((data) => {
+   //             console.log(data);
+   //             setStatus("session exist, id : " + data);
+   //          });
+   //    } else {
+   //       setStatus("session not exist !");
+   //    }
+   // }, []);
 
    const onLogin = async (e) => {
       e.preventDefault();
@@ -26,14 +47,19 @@ function Login() {
          });
 
          if (res.status === 200) {
-            const user = await res.json();
-            console.log(user);
-            dispatch(setCurrentUser({ currentUser: user, type: user.type }));
+            const data = await res.json();
+            console.log(data);
+            dispatch(
+               setCurrentUser({ currentUser: data.user, type: data.user.type })
+            );
+            localStorage.setItem("idSession", data.idSession);
             history.push("/");
          } else {
             throw new Error();
          }
-      } catch (error) {}
+      } catch (error) {
+         setFormErreur("identification erronée");
+      }
 
       // if (email === "medecin") {
       //    dispatch(setCurrentUser({ currentUser: randomUser, type: "medecin" }));
@@ -48,32 +74,62 @@ function Login() {
    };
 
    return (
-      <div className="bg__lightgray pt-24">
-         <div className="max-w-2xl mx-auto border p-8 bg-white shadow-md">
-            <form className="form__1" onSubmit={onLogin}>
-               <h2 className="text-center mb-12">Cabinet Médical</h2>
+      <>
+         <div className="login__page min-h-screen grid grid-cols-12">
+            <div className="left__part col-span-5 hidden lg:flex p-8">
+               <div className="">
+                  <h1>Mon Cabinet Medical</h1>
+                  <p>
+                     L'objectif de ce site est de faire partager et de diffuser
+                     très facilement les cours enseignés de la filière Sciences
+                     Mathématiques et informatique (SMI) au niveau de la Faculté
+                     des Sciences AÏN CHOK (FSAC) , Université HASSAN II (UH2) .{" "}
+                  </p>
+               </div>
+            </div>
+            <div className="right__part col-span-12 lg:col-span-7 flex items-center justify-center p-8">
+               <div className="w-full">
+                  <h1 className="text-center">Login</h1>
+                  <form className="max-w-xl mx-auto" onSubmit={onLogin}>
+                     {FormErreur && (
+                        <div className="p-4 border border-red-200 mb-6 bg-red-100 text-center">
+                           <p className="text-red-900 ">{FormErreur}</p>
+                        </div>
+                     )}
 
-               <div>
-                  <label htmlFor="login">login</label>
-                  <input type="text" name="login" />
+                     <div className="form__control">
+                        <input
+                           type="text"
+                           name="login"
+                           placeholder="email ou CIN"
+                           required
+                        />
+                        <i className="fas fa-user icon"></i>
+                     </div>
+                     <div className="form__control">
+                        <input
+                           type="password"
+                           name="motDePasse"
+                           placeholder="mot de passe"
+                           required
+                        />
+                        <i class="fas fa-lock icon"></i>
+                     </div>
+                     <div className="mb-12 flex justify-end">
+                        <a className="lien font-light" href="">
+                           mot de passe oublié ?
+                        </a>
+                     </div>
+                     <div className="">
+                        <button type="submit" className="text-2xl">
+                           login
+                        </button>
+                     </div>
+                  </form>
                </div>
-               <div className="">
-                  <label htmlFor="motDePasse">mot de passe</label>
-                  <input type="password" name="motDePasse" />
-               </div>
-               <div className="mb-8">
-                  <a className="lien font-light" href="">
-                     mot de passe oublié ?
-                  </a>
-               </div>
-               <div className="">
-                  <button type="submit" className="button__3 text-2xl">
-                     login
-                  </button>
-               </div>
-            </form>
+            </div>
          </div>
-      </div>
+      </>
    );
 }
 

@@ -1,15 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { BASE_URL } from "../../api/api";
 import defaultImageProfile from "../../assets/images/default-img-profile.jpg";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 import { updatePatient } from "../../redux/patient/patient.actions";
 
-function DossierAdministratif({ patient }) {
+function DossierAdministratif({ patient, mode }) {
    const dispatch = useDispatch();
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
+   const formElement = useRef();
+
    useEffect(() => {
+      if (mode === "readOnly") {
+         formElement.current
+            .querySelectorAll("input, textarea, select")
+            .forEach((elem) => {
+               elem.disabled = true;
+            });
+      }
       if (patient.imageProfile) {
          setPreviewImage(BASE_URL + patient.imageProfile);
       }
@@ -53,7 +62,12 @@ function DossierAdministratif({ patient }) {
 
    return (
       <div>
-         <form id="patientForm" className="form__2" onSubmit={handleSubmit}>
+         <form
+            ref={formElement}
+            id="patientForm"
+            className="form__2"
+            onSubmit={handleSubmit}
+         >
             <div className="flex justify-center mb-12">
                <div className="w-48 h-48 mb-8 relative">
                   <img
@@ -154,10 +168,10 @@ function DossierAdministratif({ patient }) {
                <label htmlFor="tel">Tel :</label>
                <input type="text" name="tel" defaultValue={patient.tel} />
             </div>
-            <div className="input__group">
+            {/* <div className="input__group">
                <label htmlFor="tel">Ville :</label>
                <input type="text" name="ville" />
-            </div>
+            </div> */}
             <div className="input__group">
                <label htmlFor="adresse">Adresse :</label>
                <textarea
@@ -187,11 +201,11 @@ function DossierAdministratif({ patient }) {
                   defaultChecked={patient.decede}
                />
             </div>
-            <div className="input__group"></div>
-
-            <button className="button__2" type="submit">
-               Modifier
-            </button>
+            {mode !== "readOnly" && (
+               <button className="button__2" type="submit">
+                  Modifier
+               </button>
+            )}
          </form>
       </div>
    );

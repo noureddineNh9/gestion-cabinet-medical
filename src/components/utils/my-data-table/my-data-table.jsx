@@ -20,7 +20,7 @@ function MyDataTable({ ...props }) {
                borderRightWidth: "1px",
                borderRightColor: "#d3d3d3",
             },
-            backgroundColor: "#eef",
+            backgroundColor: "#eaeefd",
          },
       },
       head: {

@@ -185,3 +185,26 @@
       font-weight: 600;
    }
 }
+.button__7 {
+   padding: 0.7rem 1.8rem;
+   border-radius: 0.4rem;
+   background-color: var(--color-primary-1);
+   background-image: linear-gradient(to right bottom, #00000000, #0000001e);
+   color: white;
+
+   transition: all 0.3s;
+   &:hover {
+      opacity: 0.9;
+   }
+}
+.button__8 {
+   padding: 0.7rem 1.8rem;
+   border-radius: 0.4rem;
+   background-color: var(--color-lightgray-3);
+   color: var(--color-primary-1);
+
+   transition: all 0.3s;
+   &:hover {
+      background-color: var(--color-lightgray-4);
+   }
+}

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { useRouteMatch } from "react-router-dom";
 import { Link, Route, Switch } from "react-router-dom";
+import NotFound from "../../pages/not-found/not-found";
 import Antecedents from "../antecedents/antecedents.component";
 import ConsultationList from "../consultation-list/consultation-list";
 
@@ -9,12 +11,16 @@ import Consultation from "../consultation/consultation.component";
 import DossierAdministratif from "../dossier-administratif/dossier-administratif.component";
 import ElementSanteList from "../element-sante-list/element-sante-list";
 import ElementSante from "../element-sante/element-sante.component";
+import PatientStatistique from "../patient-statistique/patient-statistique";
 
 import "./dossier-patient.styles.scss";
 
 function DossierPatient(props) {
    const match = useRouteMatch();
    const idPatient = match.params.id;
+
+   const user = useSelector((state) => state.user);
+
    const patient = useSelector((state) => {
       return state.patient.filter((p) => p.idUtilisateur == idPatient)[0];
    });
@@ -66,37 +72,71 @@ function DossierPatient(props) {
                   Dossier Patient
                </h3>
                <h5 className="text-center font-semibold mb-2">{`${patient.nom} ${patient.prenom}`}</h5>
-               <h6 className="text-center font-semibold">Age : 25 ans</h6>
+               <h6 className="text-center font-semibold">
+                  {`Age : ${
+                     new Date().getFullYear() -
+                     new Date(patient.dateNaissance).getFullYear()
+                  } ans`}
+               </h6>
             </div>
             <ul className="menu">
+               {(user.type === "medecin" || user.type === "patient") && (
+                  <>
+                     <li>
+                        <Link to={`${match.url}/statistique`} className="link">
+                           <i className="far fa-chart-bar"></i> Statistique
+                        </Link>
+                     </li>
+                  </>
+               )}
+
                <li>
-                  <Link to={`${match.url}`} className="link active">
-                     Dossier Administratif
+                  <Link to={`${match.url}/administratif`} className="link">
+                     <i className="fas fa-address-card"></i> Dossier
+                     Administratif
                   </Link>
                </li>
                <li>
                   <Link to={`${match.url}/consultation`} className="link">
-                     Consultations
+                     <i className="fas fa-notes-medical"></i> Consultations
                   </Link>
                </li>
-               <li>
-                  <Link to={`${match.url}/antecedents`} className="link">
-                     Antecedents
-                  </Link>
-               </li>
-               <li>
-                  <Link to={`${match.url}/element-sante`} className="link">
-                     Elements santé
-                  </Link>
-               </li>
+               {(user.type === "medecin" || user.type === "patient") && (
+                  <>
+                     <li>
+                        <Link to={`${match.url}/antecedents`} className="link">
+                           <i className="fas fa-clone"></i> Antecedents
+                        </Link>
+                     </li>
+                     <li>
+                        <Link
+                           to={`${match.url}/element-sante`}
+                           className="link"
+                        >
+                           <i className="fas fa-book-medical"></i> Elements
+                           santé
+                        </Link>
+                     </li>
+                  </>
+               )}
             </ul>
          </div>
          <div className="content p-8">
             <Switch>
                <Route
                   exact
-                  path={`${match.url}`}
-                  component={() => <DossierAdministratif patient={patient} />}
+                  path={`${match.url}/`}
+                  component={() => <Redirect to={`${match.url}/statistique`} />}
+               />
+               <Route
+                  exact
+                  path={`${match.url}/administratif`}
+                  component={() => (
+                     <DossierAdministratif
+                        patient={patient}
+                        mode={user.type !== "secretaire" && "readOnly"}
+                     />
+                  )}
                />
                <Route
                   exact
@@ -113,20 +153,47 @@ function DossierPatient(props) {
                   path={`${match.url}/consultation/:id`}
                   component={Consultation}
                />
-               <Route
-                  exact
-                  path={`${match.url}/antecedents`}
-                  component={() => <Antecedents idPatient={idPatient} />}
-               />
-               <Route
-                  exact
-                  path={`${match.url}/element-sante`}
-                  component={() => <ElementSanteList idPatient={idPatient} />}
-               />
-               <Route
-                  path={`${match.url}/element-sante/:id`}
-                  component={ElementSante}
-               />
+
+               {(user.type === "medecin" || user.type === "patient") && (
+                  <>
+                     <Route
+                        exact
+                        path={`${match.url}/antecedents`}
+                        component={() => (
+                           <Antecedents
+                              idPatient={idPatient}
+                              userType={user.type}
+                           />
+                        )}
+                     />
+                     <Route
+                        exact
+                        path={`${match.url}/statistique`}
+                        component={() => (
+                           <PatientStatistique
+                              idPatient={idPatient}
+                              consultations={consultations}
+                           />
+                        )}
+                     />
+                     <Route
+                        exact
+                        path={`${match.url}/element-sante`}
+                        component={() => (
+                           <ElementSanteList
+                              idPatient={idPatient}
+                              userType={user.type}
+                           />
+                        )}
+                     />
+                     <Route
+                        path={`${match.url}/element-sante/:id`}
+                        component={ElementSante}
+                        userType={user.type}
+                     />
+                  </>
+               )}
+               <Route path="*" component={NotFound} />
             </Switch>
             <br />
             <br />

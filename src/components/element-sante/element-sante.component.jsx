@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouteMatch } from "react-router-dom";
 import { Link, Route, Switch } from "react-router-dom";
@@ -15,6 +15,19 @@ const Index = ({ match }) => {
    const dispatch = useDispatch();
 
    const idElement = match.params.id;
+   const formElement = useRef();
+
+   const userType = useSelector((state) => state.user.type);
+
+   useEffect(() => {
+      if (userType !== "medecin") {
+         formElement.current
+            .querySelectorAll("input, textarea, select")
+            .forEach((elem) => {
+               elem.disabled = true;
+            });
+      }
+   }, []);
 
    const ElementSante = useSelector(
       (state) => state.elementSante.filter((e) => e.idElement == idElement)[0]
@@ -26,33 +39,34 @@ const Index = ({ match }) => {
 
    const handleSubmit = async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const formJson = Object.fromEntries(formData);
 
-      console.log("ajouter");
+      if (userType === "medecin") {
+         const formData = new FormData(e.target);
+         const formJson = Object.fromEntries(formData);
 
-      //ajouter
-      try {
-         const res = await fetch(BASE_URL + "/api/element-sante/put.php", {
-            method: "post",
-            body: formData,
-         });
+         //ajouter
+         try {
+            const res = await fetch(BASE_URL + "/api/element-sante/put.php", {
+               method: "post",
+               body: formData,
+            });
 
-         if (res.status === 200) {
-            const data = await res.json();
-            dispatch(modifierElementSante({ ...ElementSante, ...formJson }));
-            dispatch(
-               setNotificationOn({
-                  message: "Modification avec success",
-                  time: 3000,
-               })
-            );
-            // setTimeout(() => {
-            //    dispatch(setNotificationOff());
-            // }, 2000);
+            if (res.status === 200) {
+               const data = await res.json();
+               dispatch(modifierElementSante({ ...ElementSante, ...formJson }));
+               dispatch(
+                  setNotificationOn({
+                     message: "Modification avec success",
+                     time: 3000,
+                  })
+               );
+               // setTimeout(() => {
+               //    dispatch(setNotificationOff());
+               // }, 2000);
+            }
+         } catch (error) {
+            console.log("erreur");
          }
-      } catch (error) {
-         console.log("erreur");
       }
    };
 
@@ -61,7 +75,7 @@ const Index = ({ match }) => {
          <div>
             <h2 className="title__1">Element Santé : {ElementSante.nom}</h2>
             <br />
-            <form action="" className="form__2" onSubmit={handleSubmit}>
+            <form ref={formElement} className="form__2" onSubmit={handleSubmit}>
                <input
                   type="number"
                   name="idElement"
@@ -106,9 +120,11 @@ const Index = ({ match }) => {
                   ></textarea>
                </div>
                <br />
-               <button className="button__1" type="submit">
-                  Enregister
-               </button>
+               {userType === "medecin" && (
+                  <button className="button__1" type="submit">
+                     Enregister
+                  </button>
+               )}
             </form>
          </div>
 
@@ -119,12 +135,13 @@ const Index = ({ match }) => {
          <ConsultationList
             idElement={idElement}
             consultations={consultations}
+            mode={userType !== "medecin" && "read"}
          />
       </>
    );
 };
 
-function ElementSante(props) {
+function ElementSante() {
    const match = useRouteMatch();
 
    return (

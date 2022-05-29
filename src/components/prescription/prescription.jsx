@@ -11,7 +11,7 @@ import {
 import { BASE_URL } from "../../api/api";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 
-export const Prescription = ({ idConsultation }) => {
+export const Prescription = ({ idConsultation, userType }) => {
    const [ButtonValue, setButtonValue] = useState("ajouter");
 
    const formElement = useRef();
@@ -231,13 +231,14 @@ export const Prescription = ({ idConsultation }) => {
                <div className="form__2">
                   <div className="flex items-center mb-8">
                      <h3 className=" w-full">list des médicaments</h3>
-
-                     <button
-                        className="button__3"
-                        onClick={onAjouterMedicament}
-                     >
-                        ajouter
-                     </button>
+                     {userType === "medecin" && (
+                        <button
+                           className="button__3"
+                           onClick={onAjouterMedicament}
+                        >
+                           ajouter
+                        </button>
+                     )}
                   </div>
 
                   <ul id="collapse-list" className="medicament__list">
@@ -249,25 +250,27 @@ export const Prescription = ({ idConsultation }) => {
                            >
                               <p>{m.nom}</p>
 
-                              <div>
-                                 <button
-                                    className="ml-4"
-                                    onClick={() =>
-                                       onUpdateMedicament(m.idMedicament)
-                                    }
-                                 >
-                                    {/* <i className="text-4xl fas fa-eye edit__icon"></i> */}
-                                    <i className="text-4xl far fa-edit edit__icon"></i>
-                                 </button>
-                                 <button
-                                    className="ml-4"
-                                    onClick={() =>
-                                       onDeleteMedicament(m.idMedicament)
-                                    }
-                                 >
-                                    <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                                 </button>
-                              </div>
+                              {userType === "medecin" && (
+                                 <div>
+                                    <button
+                                       className="ml-4"
+                                       onClick={() =>
+                                          onUpdateMedicament(m.idMedicament)
+                                       }
+                                    >
+                                       {/* <i className="text-4xl fas fa-eye edit__icon"></i> */}
+                                       <i className="text-4xl far fa-edit edit__icon"></i>
+                                    </button>
+                                    <button
+                                       className="ml-4"
+                                       onClick={() =>
+                                          onDeleteMedicament(m.idMedicament)
+                                       }
+                                    >
+                                       <i className="text-4xl far fa-trash-alt delete__icon"></i>
+                                    </button>
+                                 </div>
+                              )}
                            </div>
                            <div
                               data-id={m.idMedicament}
@@ -336,11 +339,14 @@ export const Prescription = ({ idConsultation }) => {
                            cols="30"
                            rows="4"
                            defaultValue={prescription.conseilsMedicaux}
+                           disabled={userType !== "medecin"}
                         ></textarea>
                      </div>
-                     <button className="button__1" type="submit">
-                        Enregister
-                     </button>
+                     {userType === "medecin" && (
+                        <button className="button__1" type="submit">
+                           Enregister
+                        </button>
+                     )}
                   </form>
                </div>
 

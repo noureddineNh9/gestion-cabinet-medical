@@ -14,7 +14,7 @@ import { BASE_URL } from "../../api/api";
 import AjouterAudioButton from "../AjouterAudioButton";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 
-function CompteRenduList({ idConsultation }) {
+function CompteRenduList({ idConsultation, userType }) {
    const compteRenduForm = useRef();
    const collapseList = useRef();
 
@@ -230,43 +230,53 @@ function CompteRenduList({ idConsultation }) {
                <thead>
                   <tr>
                      <th>nom</th>
-                     <th>audio</th>
+                     {(userType === "medecin" || userType === "secretaire") && (
+                        <th>audio</th>
+                     )}
                      <th>document</th>
-                     <th></th>
+                     {userType === "medecin" && <th></th>}
                   </tr>
                </thead>
                <tbody>
                   {comptesRendu.map((c) => (
                      <tr key={c.idCompteRendu}>
                         <td>{c.nom}</td>
-                        <td className=" h-32">
-                           <div className="flex">
-                              {c.audio ? (
-                                 <>
-                                    <audio
-                                       className=""
-                                       controls
-                                       src={BASE_URL + c.audio.url}
-                                    ></audio>
-                                    <button
-                                       onClick={() =>
-                                          onDeleteAudio(c.audio.idAudio)
-                                       }
-                                       className="text-4xl text-gray-800 ml-4"
-                                    >
-                                       &#x2715;
-                                    </button>
-                                 </>
-                              ) : (
-                                 <span>
-                                    <AjouterAudioButton
-                                       className="lien"
-                                       idCompteRendu={c.idCompteRendu}
-                                    />
-                                 </span>
-                              )}
-                           </div>
-                        </td>
+                        {(userType === "medecin" ||
+                           userType === "secretaire") && (
+                           <td className=" h-32">
+                              <div className="flex">
+                                 {c.audio ? (
+                                    <>
+                                       <audio
+                                          className=""
+                                          controls
+                                          src={BASE_URL + c.audio.url}
+                                       ></audio>
+                                       {userType === "medecin" && (
+                                          <button
+                                             onClick={() =>
+                                                onDeleteAudio(c.audio.idAudio)
+                                             }
+                                             className="text-4xl text-gray-800 ml-4"
+                                          >
+                                             &#x2715;
+                                          </button>
+                                       )}
+                                    </>
+                                 ) : (
+                                    <span>
+                                       {userType === "medecin" && (
+                                          <AjouterAudioButton
+                                             className="lien"
+                                             idCompteRendu={c.idCompteRendu}
+                                          />
+                                       )}
+                                    </span>
+                                 )}
+                              </div>
+                           </td>
+                        )}
+
                         <td>
                            {c.url ? (
                               <>
@@ -285,30 +295,35 @@ function CompteRenduList({ idConsultation }) {
                            ) : (
                               <>
                                  {/* <i class="fas fa-file-upload mr-2 text-3xl"></i> */}
-                                 <input
-                                    type="file"
-                                    onChange={(e) =>
-                                       onAjouteFichier(e, c.idCompteRendu)
-                                    }
-                                    className="file__input w-60"
-                                 />
+                                 {(userType === "medecin" ||
+                                    userType === "secretaire") && (
+                                    <input
+                                       type="file"
+                                       onChange={(e) =>
+                                          onAjouteFichier(e, c.idCompteRendu)
+                                       }
+                                       className="file__input w-60"
+                                    />
+                                 )}
                               </>
                            )}
                         </td>
-                        <td>
-                           <div className="flex justify-around items-end">
-                              <button onClick={() => onUpdateCompteRendu(c)}>
-                                 <i className="text-4xl far fa-edit edit__icon"></i>
-                              </button>
-                              <button
-                                 onClick={() =>
-                                    onDeleteCompteRendu(c.idCompteRendu)
-                                 }
-                              >
-                                 <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                              </button>
-                           </div>
-                        </td>
+                        {userType === "medecin" && (
+                           <td>
+                              <div className="flex justify-around items-end">
+                                 <button onClick={() => onUpdateCompteRendu(c)}>
+                                    <i className="text-4xl far fa-edit edit__icon"></i>
+                                 </button>
+                                 <button
+                                    onClick={() =>
+                                       onDeleteCompteRendu(c.idCompteRendu)
+                                    }
+                                 >
+                                    <i className="text-4xl far fa-trash-alt delete__icon"></i>
+                                 </button>
+                              </div>
+                           </td>
+                        )}
                      </tr>
                   ))}
                </tbody>

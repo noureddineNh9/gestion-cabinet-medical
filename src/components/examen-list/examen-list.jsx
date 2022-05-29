@@ -10,7 +10,7 @@ import {
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 import Modal from "../utils/modal__1/modal__1.component";
 
-function ExamenList({ idConsultation }) {
+function ExamenList({ idConsultation, userType }) {
    const [NbDocuments, setNbDocuments] = useState(1);
    const dispatch = useDispatch();
    const formElement = useRef();
@@ -173,9 +173,11 @@ function ExamenList({ idConsultation }) {
             <h3 id="3" className="collapse-item title__1 w-full">
                les examens
             </h3>
-            <button className="button__3" onClick={onAjouterExamen}>
-               ajouter
-            </button>
+            {(userType === "medecin" || userType === "secretaire") && (
+               <button className="button__3" onClick={onAjouterExamen}>
+                  ajouter
+               </button>
+            )}
          </div>
          <div data-id="3" className="collapse-desc ">
             <table className="table__1 mb-16">
@@ -183,7 +185,9 @@ function ExamenList({ idConsultation }) {
                   <tr>
                      <th>nom</th>
                      <th>documents</th>
-                     <th></th>
+                     {(userType === "medecin" || userType === "secretaire") && (
+                        <th></th>
+                     )}
                   </tr>
                </thead>
                <tbody>
@@ -202,34 +206,40 @@ function ExamenList({ idConsultation }) {
                                     </a>
                                     {d.nom}
                                  </div>
-                                 <button
-                                    onClick={() =>
-                                       onDeleteDocument(
-                                          d.idDocument,
-                                          d.idExamen
-                                       )
-                                    }
-                                    className="text-4xl text-gray-500"
-                                 >
-                                    &#x2715;
-                                 </button>
+                                 {(userType === "medecin" ||
+                                    userType === "secretaire") && (
+                                    <button
+                                       onClick={() =>
+                                          onDeleteDocument(
+                                             d.idDocument,
+                                             d.idExamen
+                                          )
+                                       }
+                                       className="text-4xl text-gray-500"
+                                    >
+                                       &#x2715;
+                                    </button>
+                                 )}
                               </div>
                            ))}
                         </td>
 
-                        <td>
-                           <div className="flex justify-around items-end">
-                              <button onClick={() => onUpdateExamen(e)}>
-                                 {/* <i className="text-4xl fas fa-eye edit__icon"></i> */}
-                                 <i className="text-4xl far fa-edit edit__icon"></i>
-                              </button>
-                              <button
-                                 onClick={() => onDeleteExamen(e.idExamen)}
-                              >
-                                 <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                              </button>
-                           </div>
-                        </td>
+                        {(userType === "medecin" ||
+                           userType === "secretaire") && (
+                           <td>
+                              <div className="flex justify-around items-end">
+                                 <button onClick={() => onUpdateExamen(e)}>
+                                    {/* <i className="text-4xl fas fa-eye edit__icon"></i> */}
+                                    <i className="text-4xl far fa-edit edit__icon"></i>
+                                 </button>
+                                 <button
+                                    onClick={() => onDeleteExamen(e.idExamen)}
+                                 >
+                                    <i className="text-4xl far fa-trash-alt delete__icon"></i>
+                                 </button>
+                              </div>
+                           </td>
+                        )}
                      </tr>
                   ))}
                </tbody>

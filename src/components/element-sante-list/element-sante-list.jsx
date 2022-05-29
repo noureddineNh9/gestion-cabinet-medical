@@ -12,7 +12,7 @@ import MyDataTable from "../utils/my-data-table/my-data-table";
 import "./element-sante-list.scss";
 import { selectElementSanteByPatient } from "../../redux/elementSante/elementSante.selectors";
 
-function ElementSanteList({ idPatient }) {
+function ElementSanteList({ idPatient, userType }) {
    const [filteredItems, setFilteredItems] = useState([]);
    const [searchInputValue, setSearchInputValue] = useState("");
    const [Operation, setOperation] = useState("Ajouter");
@@ -41,6 +41,7 @@ function ElementSanteList({ idPatient }) {
          name: "nom",
          selector: (row) => row.nom,
          sortable: true,
+         width: "200px",
       },
       {
          name: "description",
@@ -59,9 +60,11 @@ function ElementSanteList({ idPatient }) {
                <Link to={`${match.url}/${row.idElement}`} className="lien">
                   <i className="text-4xl far fa-eye edit__icon"></i>
                </Link>
-               <button onClick={() => onDelete(row.idElement)}>
-                  <i className="text-4xl far fa-trash-alt delete__icon"></i>
-               </button>
+               {userType === "medecin" && (
+                  <button onClick={() => onDelete(row.idElement)}>
+                     <i className="text-4xl far fa-trash-alt delete__icon"></i>
+                  </button>
+               )}
             </>
          ),
          width: "120px",
@@ -157,9 +160,11 @@ function ElementSanteList({ idPatient }) {
                />
             </div>
             <div>
-               <button onClick={onAjoute} className="button__1">
-                  Ajouter
-               </button>
+               {userType === "medecin" && (
+                  <button onClick={onAjoute} className="button__1">
+                     Ajouter
+                  </button>
+               )}
             </div>
          </div>
          <hr />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./consultation.styles.scss";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -9,8 +9,20 @@ import { useRouteMatch } from "react-router-dom";
 import { BASE_URL } from "../../api/api";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 
-const Index = ({ consultation }) => {
+const Index = ({ consultation, userType }) => {
    const dispatch = useDispatch();
+
+   const formElement = useRef();
+
+   useEffect(() => {
+      if (userType !== "medecin") {
+         formElement.current
+            .querySelectorAll("input, textarea, select")
+            .forEach((elem) => {
+               elem.disabled = true;
+            });
+      }
+   }, []);
 
    const handleSubmit = async (e) => {
       e.preventDefault();
@@ -40,7 +52,7 @@ const Index = ({ consultation }) => {
    return (
       <>
          <h3 className="mb-16">{`Consultation du ${consultation.dateCreation} `}</h3>
-         <form className="form__2" onSubmit={handleSubmit}>
+         <form ref={formElement} className="form__2" onSubmit={handleSubmit}>
             <input
                name="idConsultation"
                type="number"
@@ -52,7 +64,7 @@ const Index = ({ consultation }) => {
                <label htmlFor="">Medecin :</label>
                <input
                   type="text"
-                  // defaultValue={`${consultation.medecin.nom} ${consultation.medecin.prenom}`}
+                  defaultValue={`${consultation.medecin.nom} ${consultation.medecin.prenom}`}
                   disabled
                />
             </div>
@@ -94,9 +106,11 @@ const Index = ({ consultation }) => {
                   defaultValue={consultation.remarques}
                ></textarea>
             </div>
-            <div>
-               <button className="button__1">Enregister</button>
-            </div>
+            {userType === "medecin" && (
+               <div>
+                  <button className="button__1">Enregister</button>
+               </div>
+            )}
          </form>
       </>
    );
@@ -105,6 +119,8 @@ const Index = ({ consultation }) => {
 function Consultation() {
    const match = useRouteMatch();
    const idConsultation = match.params.id;
+
+   const userType = useSelector((state) => state.user.type);
 
    const [Route, setRoute] = useState("index");
    const [isLoading, setIsLoading] = useState(true);
@@ -145,12 +161,15 @@ function Consultation() {
          {!isLoading && (
             <div>
                <nav className="navbar__1">
-                  <a
-                     className="link active"
-                     onClick={(e) => changeRoute("index", e)}
-                  >
-                     Consultation
-                  </a>
+                  {(userType === "medecin" || userType === "patient") && (
+                     <a
+                        className="link active"
+                        onClick={(e) => changeRoute("index", e)}
+                     >
+                        Consultation
+                     </a>
+                  )}
+
                   <a
                      className="link"
                      onClick={(e) => changeRoute("diagnostique", e)}
@@ -165,11 +184,19 @@ function Consultation() {
                   </a>
                </nav>
                {Route === "index" ? (
-                  <Index consultation={consultation} />
+                  (userType === "medecin" || userType === "patient") && (
+                     <Index consultation={consultation} userType={userType} />
+                  )
                ) : Route === "diagnostique" ? (
-                  <Diagnostique idConsultation={consultation.idConsultation} />
+                  <Diagnostique
+                     idConsultation={consultation.idConsultation}
+                     userType={userType}
+                  />
                ) : Route === "prescription" ? (
-                  <Prescription idConsultation={consultation.idConsultation} />
+                  <Prescription
+                     idConsultation={consultation.idConsultation}
+                     userType={userType}
+                  />
                ) : (
                   <></>
                )}

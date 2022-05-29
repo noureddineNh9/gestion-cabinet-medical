@@ -53,57 +53,46 @@ function App() {
    }, [notification]);
 
    useEffect(() => {
-      const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
-      if (userFromLocalStorage) {
-         dispatch(setCurrentUser(userFromLocalStorage));
+      // const userFromLocalStorage = JSON.parse(localStorage.getItem("user"));
+      // if (userFromLocalStorage) {
+      //    dispatch(setCurrentUser(userFromLocalStorage));
+      // }
+
+      const idSession = localStorage.getItem("idSession");
+
+      if (idSession) {
+         const formData = new FormData();
+         formData.append("idSession", idSession);
+         fetch(BASE_URL + "/api/isAuth.php", {
+            method: "POST",
+            body: formData,
+         })
+            .then((res) => {
+               if (res.status === 200) {
+                  return res.json();
+               } else {
+                  throw new Error();
+               }
+            })
+            .then((data) => {
+               console.log(data);
+               dispatch(setCurrentUser({ currentUser: data, type: data.type }));
+            })
+            .catch((err) => {
+               setIsLoading(false);
+            });
+      } else {
+         setIsLoading(false);
       }
    }, []);
 
    useEffect(() => {
-      // var sessionId = ";";
-      // try {
-      //    const res = await fetch(BASE_URL + "/setSession.php", {
-      //       credentials: "same-origin",
-      //    });
-      //    if (res.status === 200) {
-      //       const data = await res.json();
-
-      //       Cookies.remove("PHPSESSID");
-
-      //       Cookies.set("PHPSESSID", data);
-
-      //       try {
-      //          const res = await fetch(BASE_URL + "/getSession.php", {
-      //             credentials: "same-origin",
-      //             headers: {
-      //                Cookies: document.cookie,
-      //             },
-      //          });
-      //          if (res.status === 200) {
-      //             const data = await res.json();
-
-      //             console.log(data);
-      //          } else {
-      //             throw new Error();
-      //          }
-      //       } catch (error) {
-      //          console.log(error);
-      //       }
-      //    } else {
-      //       throw new Error();
-      //    }
-      // } catch (error) {
-      //    console.log(error);
-      // }
-
+      console.log(user);
       if (user.currentUser) {
          setIsLoading(true);
          loadData().then(() => {
-            console.log(2);
             setIsLoading(false);
          });
-      } else {
-         setIsLoading(false);
       }
    }, [user]);
    const loadData = () => {
@@ -275,6 +264,8 @@ function App() {
                               return <Redirect to="/secretaire" />;
                            } else if (user.type === "patient") {
                               return <Redirect to="/patient" />;
+                           } else if (user.type === "admin") {
+                              return <Redirect to="/admin" />;
                            }
                         } else {
                            return <Redirect to="/login" />;

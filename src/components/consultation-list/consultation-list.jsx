@@ -36,7 +36,23 @@ function ConsultationList({ idElement, consultations, mode }) {
 
    const match = useRouteMatch();
    const formElement = useRef();
+   const filterForm = useRef();
    const dispatch = useDispatch();
+
+   let medecinId = [];
+   consultations.forEach((c) => {
+      if (!medecinId.includes(c.idMedecin)) {
+         medecinId.push(c.idMedecin);
+      }
+   });
+
+   const medecinData = useSelector((state) =>
+      state.medecin.filter((m) => {
+         if (medecinId.includes(parseInt(m.idUtilisateur))) {
+            return true;
+         }
+      })
+   );
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -63,6 +79,11 @@ function ConsultationList({ idElement, consultations, mode }) {
       {
          name: "dateCreation",
          selector: (row) => row.dateCreation,
+         sortable: true,
+      },
+      {
+         name: "Element Sante",
+         selector: (row) => row.elementSante,
          sortable: true,
       },
       {
@@ -122,7 +143,6 @@ function ConsultationList({ idElement, consultations, mode }) {
 
             if (res.status === 200) {
                const data = await res.json();
-               console.log(data);
                //dispatch(ajouterElementSante(data));
 
                dispatch(
@@ -162,13 +182,58 @@ function ConsultationList({ idElement, consultations, mode }) {
       }
    };
 
+   const appliquerFilter = () => {
+      const filterData = Object.fromEntries(new FormData(filterForm.current));
+
+      let Data = consultations;
+
+      if (filterData.idMedecin) {
+         Data = Data.filter((m) => m.idMedecin == filterData.idMedecin);
+      }
+      if (filterData.type) {
+         Data = Data.filter((m) => m.type == filterData.type);
+      }
+      if (filterData.dateDebut) {
+         Data = Data.filter(
+            (m) =>
+               new Date(m.dateCreation).getTime() >=
+               new Date(filterData.dateDebut).getTime()
+         );
+      }
+      if (filterData.dateFin) {
+         Data = Data.filter(
+            (m) =>
+               new Date(m.dateCreation).getTime() <=
+               new Date(filterData.dateFin).getTime()
+         );
+      }
+
+      setFilteredItems(Data);
+   };
+
+   const annulerFilter = () => {
+      setFilteredItems(consultations);
+      filterForm.current.querySelectorAll("input, select").forEach((elem) => {
+         elem.value = "";
+      });
+   };
+
    return (
       <div className="">
-         <h2 className="title__1">Les consultations </h2>
+         <div className="md:flex justify-between items-center">
+            <h2 className="title__1 w-full mb-6">Les consultations </h2>
+            {mode !== "read" && (
+               <div>
+                  <button onClick={onAjoute} className="button__1 w-max">
+                     Ajouter une consultation
+                  </button>
+               </div>
+            )}
+         </div>
          <br />
          <div className="flex justify-between mb-8">
             <div className="relative">
-               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+               {/* <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <i className="w-5 h-5 text-gray-500 fas fa-search"></i>
                </div>
                <input
@@ -178,15 +243,69 @@ function ConsultationList({ idElement, consultations, mode }) {
                   onChange={(e) => setSearchInputValue(e.target.value)}
                   className="search__input "
                   placeholder="Search for items"
-               />
+               /> */}
             </div>
-            {mode !== "read" && (
+         </div>
+         <div className="mb-8">
+            <form ref={filterForm} action="">
+               <div className="grid grid-cols-4 gap-6 mb-8">
+                  <div className="col-span-4 lg:col-span-2 w-full">
+                     <label>date : </label>
+                     <div className="sm:flex items-center">
+                        <input
+                           type="date"
+                           name="dateDebut"
+                           className="input__1 w-full"
+                        />
+                        <span className="mx-2">-</span>
+                        <input
+                           type="date"
+                           name="dateFin"
+                           className="input__1 w-full"
+                        />
+                     </div>
+                  </div>
+
+                  <div className="col-span-4 sm:col-span-2 lg:col-span-1">
+                     <label>type : </label>
+                     <div className="flex items-center">
+                        <select name="type" className="input__1 w-full">
+                           <option></option>
+                           <option>visite</option>
+                           <option>controle</option>
+                        </select>
+                     </div>
+                  </div>
+
+                  <div className="col-span-4 sm:col-span-2 lg:col-span-1">
+                     <label>medecin : </label>
+                     <div className="flex items-center">
+                        <select name="idMedecin" className="input__1 w-full">
+                           <option></option>
+                           {medecinData.map((m) => (
+                              <option
+                                 key={m.idUtilisateur}
+                                 value={m.idUtilisateur}
+                              >
+                                 {m.nom + " " + m.prenom}
+                              </option>
+                           ))}
+                        </select>
+                     </div>
+                  </div>
+               </div>
+            </form>
+
+            <div className="flex justify-end">
                <div>
-                  <button onClick={onAjoute} className="button__1">
-                     Ajouter
+                  <button onClick={annulerFilter} className="button__8 mr-6">
+                     Annuler
+                  </button>
+                  <button onClick={appliquerFilter} className="button__7">
+                     Appliquer
                   </button>
                </div>
-            )}
+            </div>
          </div>
          <hr />
          <br />
