@@ -239,9 +239,10 @@ function DiagnistiqueAudioPage() {
       setModalActive(false);
       document.querySelector("body").classList.remove("modal__active");
    };
+   const currentUser = useSelector((state) => state.user.currentUser);
 
    const comptesRenduData = useSelector((state) =>
-      selectCompteRenduBySecretaire(state)
+      selectCompteRenduBySecretaire(state, currentUser.idUtilisateur)
    );
 
    useEffect(() => {

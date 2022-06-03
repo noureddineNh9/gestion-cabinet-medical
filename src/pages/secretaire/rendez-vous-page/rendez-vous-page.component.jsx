@@ -88,6 +88,8 @@ function RendezVousPage() {
 
    const RendezVousData = useSelector((state) => state.rendezVous);
 
+   const [operation, setOperation] = useState("");
+
    const formElement = useRef();
    const dispatch = useDispatch();
 
@@ -136,6 +138,7 @@ function RendezVousPage() {
 
       if (!formData.get("idRDV")) {
          //ajouter
+         formData.append("status", "confirme");
          try {
             const res = await fetch(BASE_URL + "/api/rendez-vous/post.php", {
                method: "post",
@@ -188,7 +191,7 @@ function RendezVousPage() {
    const initializeForm = () => {
       formElement.current.idRDV.value = "";
       formElement.current.type.value = "";
-      formElement.current.status.value = "";
+      //formElement.current.status.value = "";
       formElement.current.dateRDV.value = "";
 
       setMedecinSelected(null);
@@ -196,11 +199,13 @@ function RendezVousPage() {
    };
 
    const onAjoute = () => {
+      setOperation("ajouter");
       initializeForm();
       showModal();
    };
 
-   const onUpdate = (rdv) => {
+   const onUpdate = async (rdv) => {
+      await setOperation("modifier");
       formElement.current.idRDV.value = rdv.idRDV;
       formElement.current.type.value = rdv.type;
       formElement.current.status.value = rdv.status;
@@ -255,37 +260,6 @@ function RendezVousPage() {
          </div>
          <hr />
          <br />
-         {/* <div>
-            <table className="table__1 ">
-               <thead>
-                  <tr>
-                     <th>nom de patient</th>
-                     <th>num de tel</th>
-                     <th>date</th>
-                     <th>medecin</th>
-                     <th></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  <tr>
-                     <td>amine koulali</td>
-                     <td>062345678</td>
-                     <td>12-06-2022 15:00</td>
-                     <td>Dr. flan</td>
-                     <td>
-                        <div className="flex justify-around items-end">
-                           <button>
-                              <i className="text-4xl far fa-edit edit__icon"></i>
-                           </button>
-                           <button>
-                              <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                           </button>
-                        </div>
-                     </td>
-                  </tr>
-               </tbody>
-            </table>
-         </div> */}
          <div id="collapse-list">
             <h3 id="111" className="collapse-item title__1 mb-8">
                Rendez-vous confirmé
@@ -377,16 +351,18 @@ function RendezVousPage() {
                      </div>
                   </div>
 
-                  <div className="flex gap-6 mb-4">
-                     <div className="max-w-md">
-                        <label>status :</label>
-                        <select name="status">
-                           <option>enAttente</option>
-                           <option>confirme</option>
-                           <option>termine</option>
-                        </select>
+                  {operation === "modifier" && (
+                     <div className="flex gap-6 mb-4">
+                        <div className="max-w-md">
+                           <label>status :</label>
+                           <select name="status">
+                              <option>enAttente</option>
+                              <option>confirme</option>
+                              <option>termine</option>
+                           </select>
+                        </div>
                      </div>
-                  </div>
+                  )}
 
                   <div className="flex gap-6 mb-4">
                      <div className="max-w-md">

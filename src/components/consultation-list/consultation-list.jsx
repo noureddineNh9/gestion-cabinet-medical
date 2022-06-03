@@ -3,31 +3,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouteMatch } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { BASE_URL } from "../../api/api";
+import {
+   ajouterConsultation,
+   deleteConsultation,
+} from "../../redux/consultation/consultation.action";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 import Modal from "../utils/modal__1/modal__1.component";
 import MyDataTable from "../utils/my-data-table/my-data-table";
-const ConsulationsData = [
-   {
-      idConsultation: 2,
-      date: "3/4/2022",
-      type: "Visite",
-   },
-   {
-      idConsultation: 4,
-      date: "3/4/2022",
-      type: "Controle",
-   },
-   {
-      idConsultation: 9,
-      date: "3/4/2022",
-      type: "Visite",
-   },
-   {
-      idConsultation: 7,
-      date: "3/4/2022",
-      type: "Visite",
-   },
-];
 
 function ConsultationList({ idElement, consultations, mode }) {
    const [filteredItems, setFilteredItems] = useState([]);
@@ -94,7 +76,7 @@ function ConsultationList({ idElement, consultations, mode }) {
                   <i className="text-4xl far fa-eye edit__icon"></i>
                </Link>
                {mode !== "read" && (
-                  <button onClick={() => onDelete(row.idElement)}>
+                  <button onClick={() => onDelete(row.idConsultation)}>
                      <i className="text-4xl far fa-trash-alt delete__icon"></i>
                   </button>
                )}
@@ -143,7 +125,7 @@ function ConsultationList({ idElement, consultations, mode }) {
 
             if (res.status === 200) {
                const data = await res.json();
-               //dispatch(ajouterElementSante(data));
+               dispatch(ajouterConsultation(data));
 
                dispatch(
                   setNotificationOn({
@@ -168,17 +150,19 @@ function ConsultationList({ idElement, consultations, mode }) {
    };
 
    const onDelete = async (id) => {
-      try {
-         const res = await fetch(
-            BASE_URL + "/api/element-sante/delete.php?id=" + id
-         );
-
-         if (res.status === 200) {
-            //dispatch(deleteElementSante({ idElement: id }));
-            hideModal();
+      const confirm = window.confirm("Vous voulez vraiment le supprimer ?");
+      if (confirm) {
+         try {
+            const res = await fetch(
+               BASE_URL + "/api/consultation/delete.php?id=" + id
+            );
+            if (res.status === 200) {
+               dispatch(deleteConsultation({ idConsultation: id }));
+               hideModal();
+            }
+         } catch (error) {
+            console.log("erreur");
          }
-      } catch (error) {
-         console.log("erreur");
       }
    };
 

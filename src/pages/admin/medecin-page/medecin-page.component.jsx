@@ -16,6 +16,7 @@ import {
 } from "../../../redux/medecin/medecin.actions";
 
 function MedecinPage() {
+   const [operation, setOperation] = useState("");
    const [filteredData, setFilteredData] = useState([]);
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
@@ -84,6 +85,7 @@ function MedecinPage() {
    };
 
    const onAjouteMedecin = () => {
+      setOperation("ajouter");
       showModal();
    };
 
@@ -101,6 +103,7 @@ function MedecinPage() {
    };
 
    const onUpdateMedecin = (id) => {
+      setOperation("modifier");
       setModalActive(true);
 
       const form = document.querySelector("#medecinForm");
@@ -333,14 +336,17 @@ function MedecinPage() {
                      <label htmlFor="email">email :</label>
                      <input type="text" name="email" placeholder="email" />
                   </div>
-                  <div className="w-full">
-                     <label htmlFor="motDePasse">mot de passe :</label>
-                     <input
-                        type="password"
-                        name="motDePasse"
-                        placeholder="motDePasse"
-                     />
-                  </div>
+                  {operation === "ajouter" && (
+                     <div className="w-full">
+                        <label htmlFor="motDePasse">mot de passe :</label>
+                        <input
+                           type="password"
+                           name="motDePasse"
+                           placeholder="motDePasse"
+                        />
+                     </div>
+                  )}
+
                   <div className="w-full">
                      <label htmlFor="tel">tel :</label>
                      <input type="text" name="tel" placeholder="tel" />

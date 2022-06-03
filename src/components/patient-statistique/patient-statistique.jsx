@@ -25,6 +25,13 @@ function PatientStatistique({ idPatient, consultationsData }) {
       });
       return list;
    });
+
+   const derniersConsultation = consultations
+      .sort((a, b) => b.idConsultation - a.idConsultation)
+      .filter((c, i) => i < 3);
+
+   console.log(derniersConsultation);
+
    const nbConsultations = consultations.length;
 
    var options = {
@@ -106,29 +113,21 @@ function PatientStatistique({ idPatient, consultationsData }) {
                         Dernier consultation
                      </h3>
 
-                     <span className="date h-max">21/02/2022</span>
+                     <span className="date h-max">
+                        {derniersConsultation[0].dateCreation}
+                     </span>
                   </div>
                   <p className="mb-6 ">
                      <strong>motif de consultation : </strong>
                      <span className="text-gray-600">
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Labore, quo vitae. Inventore obcaecati ea, quidem
-                        cupiditate harum, explicabo numquam dicta, illum
-                        reiciendis est ipsa eligendi saepe! Ad quasi dolores
-                        saepe, nisi, deleniti nobis ipsam debitis minima
-                        quisquam quos molestias esse veniam, consectetur fugiat
-                        excepturi dolor.
+                        {derniersConsultation[0].motif}
                      </span>
                   </p>
 
                   <p>
                      <strong>remarques : </strong>
                      <span className="text-gray-600">
-                        Lorem ipsum dolor, sit amet consectetur adipisicing
-                        elit. Labore, quo vitae. Inventore obcaecati ea, quidem
-                        cupiditate harum, explicabo numquam dicta, illum
-                        reiciendis est ipsa eligendi saepe! Ad quasi dolores
-                        saepe.
+                        {derniersConsultation[0].remarques}
                      </span>
                   </p>
                </div>
@@ -136,45 +135,17 @@ function PatientStatistique({ idPatient, consultationsData }) {
                   <h3 className="mb-6 text-slate-500 font-semibold">
                      Remarques
                   </h3>
-                  <div className=" mb-8 border-b p-2">
-                     <p className="text-gray-600 mb-2">
-                        elit. Labore, quo vitae. Inventore obcaecati ea, quidem
-                        cupiditate harum, explicabo numquam dicta, illum
-                        reiciendis est ipsa eligendi saepe! Ad quasi dolores
-                        saepe.
-                     </p>
-                     <div className="flex justify-end  mb-2">
-                        <span className="font-light text-slate-500 italic">
-                           21/02/2022
-                        </span>
+
+                  {derniersConsultation.map((c) => (
+                     <div key={c.idConsultation} className=" mb-8 border-b p-2">
+                        <p className="text-gray-600 mb-2">{c.remarques}</p>
+                        <div className="flex justify-end  mb-2">
+                           <span className="font-light text-slate-500 italic">
+                              {c.dateCreation}
+                           </span>
+                        </div>
                      </div>
-                  </div>
-                  <div className=" mb-8 border-b p-2">
-                     <p className="text-gray-600 mb-2">
-                        elit. Labore, quo vitae. Inventore obcaecati ea, quidem
-                        cupiditate harum, explicabo numquam dicta, illum
-                        reiciendis est ipsa eligendi saepe! Ad quasi dolores
-                        saepe.
-                     </p>
-                     <div className="flex justify-end  mb-2">
-                        <span className="font-light text-slate-500 italic">
-                           21/02/2022
-                        </span>
-                     </div>
-                  </div>
-                  <div className=" p-2">
-                     <p className="text-gray-600 mb-2">
-                        elit. Labore, quo vitae. Inventore obcaecati ea, quidem
-                        cupiditate harum, explicabo numquam dicta, illum
-                        reiciendis est ipsa eligendi saepe! Ad quasi dolores
-                        saepe.
-                     </p>
-                     <div className="flex justify-end  mb-2">
-                        <span className="font-light text-slate-500 italic">
-                           21/02/2022
-                        </span>
-                     </div>
-                  </div>
+                  ))}
                </div>
             </div>
          </div>

@@ -202,7 +202,15 @@ function ExamenList({ idConsultation, userType }) {
                               >
                                  <div className="">
                                     <a href={BASE_URL + d.url} target="_blank">
-                                       <i className="text-3xl text-gray-700 far fa-file-alt mr-3"></i>
+                                       {["png", "jpg", "jpeg"].includes(
+                                          d.url.split(".")[
+                                             d.url.split(".").length - 1
+                                          ]
+                                       ) ? (
+                                          <i className="text-3xl text-gray-700 fas fa-file-image mr-3"></i>
+                                       ) : (
+                                          <i className="text-3xl text-gray-700 far fa-file-alt mr-3"></i>
+                                       )}
                                     </a>
                                     {d.nom}
                                  </div>

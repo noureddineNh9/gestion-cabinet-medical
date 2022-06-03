@@ -403,12 +403,16 @@ export const Prescription = ({ idConsultation, userType }) => {
             </>
          ) : (
             <div className="flex justify-center items-center ">
-               <button
-                  onClick={onAjoutePrescription}
-                  className="button__4 mt-80"
-               >
-                  ajouter la prescription
-               </button>
+               {userType === "medecin" ? (
+                  <button
+                     onClick={onAjoutePrescription}
+                     className="button__4 mt-80"
+                  >
+                     ajouter la prescription
+                  </button>
+               ) : (
+                  <h4 className=" mt-80">pas de prescription</h4>
+               )}
             </div>
          )}
       </>

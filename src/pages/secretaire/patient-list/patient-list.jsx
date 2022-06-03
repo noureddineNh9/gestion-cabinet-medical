@@ -22,10 +22,6 @@ function PatientList() {
    const PatientData = useSelector((state) => state.patient);
 
    const [filteredData, setFilteredData] = useState([]);
-   const [pageData, setPageData] = useState([]);
-
-   // const [currentPage, setCurrentPage] = useState(1);
-   const [itemsPerPage, setItemsPerPage] = useState(5);
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
@@ -49,12 +45,7 @@ function PatientList() {
    }, [PatientData]);
 
    useEffect(() => {
-      paginate(1);
-   }, [filteredData]);
-
-   useEffect(() => {
       initializeForm();
-      //loadData();
    }, []);
 
    const handleSubmit = async (e) => {
@@ -139,21 +130,6 @@ function PatientList() {
       }
    };
 
-   const paginate = (currentPage) => {
-      const indexOfLastEmployee = currentPage * itemsPerPage;
-      const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-      const currentData = filteredData.slice(
-         indexOfFirstEmployee,
-         indexOfLastEmployee
-      );
-
-      setPageData(currentData);
-   };
-   const countPages = Math.ceil(filteredData.length / itemsPerPage);
-   const handlePageClick = (e) => {
-      paginate(e.selected + 1);
-   };
-
    const columns = [
       {
          name: "cin",
@@ -192,7 +168,7 @@ function PatientList() {
                <UpdatePassword idUtilisateur={row.idUtilisateur} />
                <Link
                   className="mr-2"
-                  to={`/secretaire/patient/${row.idUtilisateur}`}
+                  to={`/secretaire/patient/${row.idUtilisateur}/administratif`}
                >
                   <i className="text-4xl far fa-eye edit__icon"></i>
                </Link>
@@ -233,63 +209,6 @@ function PatientList() {
          <hr />
          <br />
          <div>
-            {/* <table className="table__1 ">
-               <thead>
-                  <tr>
-                     <th>cin</th>
-                     <th>profile</th>
-                     <th>nom</th>
-                     <th>prenom</th>
-                     <th></th>
-                  </tr>
-               </thead>
-               <tbody>
-                  {pageData.map((p, index) => (
-                     <tr key={index}>
-                        <td>{p.cin}</td>
-                        <td>
-                           <img
-                              className="h-20 w-20 object-cover rounded-full border"
-                              src={BASE_URL + p.imageProfile}
-                              alt=""
-                           />
-                        </td>
-                        <td>{p.nom}</td>
-                        <td>{p.prenom}</td>
-                        <td>
-                           <div className="flex justify-around items-end">
-
-                              <Link
-                                 className="lien"
-                                 to={`/secretaire/patient/${p.idUtilisateur}`}
-                              >
-                                 consulter
-                              </Link>
-                              <button onClick={() => onDelete(p.idUtilisateur)}>
-                                 <i className="text-4xl far fa-trash-alt delete__icon"></i>
-                              </button>
-                           </div>
-                        </td>
-                     </tr>
-                  ))}
-               </tbody>
-            </table>
-
-            <div className="flex justify-center">
-               <ReactPaginate
-                  previousLabel={<i className="fas fa-angle-double-left"></i>}
-                  nextLabel={<i className="fas fa-angle-double-right"></i>}
-                  breakLabel={"..."}
-                  breakClassName={"break-me"}
-                  pageCount={countPages}
-                  marginPagesDisplayed={2}
-                  pageRangeDisplayed={5}
-                  onPageChange={handlePageClick}
-                  containerClassName={"pagination"}
-                  subContainerClassName={"pages pagination"}
-                  activeClassName={"active"}
-               />
-            </div> */}
             <MyDataTable
                columns={columns}
                data={filteredData}
@@ -379,6 +298,10 @@ function PatientList() {
                            <option>veuf</option>
                         </select>
                      </div>
+                  </div>
+                  <div className="w-full">
+                     <label>ville :</label>
+                     <input type="text" name="ville" placeholder="ville" />
                   </div>
                   <div className="w-full">
                      <label htmlFor="email">email :</label>

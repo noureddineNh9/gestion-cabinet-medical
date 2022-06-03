@@ -161,17 +161,13 @@ function DossierAdministratif({ patient, mode }) {
                <input type="text" name="email" defaultValue={patient.email} />
             </div>
             <div className="input__group">
-               <label htmlFor="motDePasse">Mot de passe :</label>
-               <input type="password" name="motDePasse" />
+               <label>ville :</label>
+               <input type="text" name="ville" defaultValue={patient.ville} />
             </div>
             <div className="input__group">
                <label htmlFor="tel">Tel :</label>
                <input type="text" name="tel" defaultValue={patient.tel} />
             </div>
-            {/* <div className="input__group">
-               <label htmlFor="tel">Ville :</label>
-               <input type="text" name="ville" />
-            </div> */}
             <div className="input__group">
                <label htmlFor="adresse">Adresse :</label>
                <textarea

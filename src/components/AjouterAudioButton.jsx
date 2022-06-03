@@ -85,14 +85,6 @@ function AjouterAudioButton({ idCompteRendu }) {
                   />
                   <input type="number" name="idAudio" hidden />
                   <div className="w-full">
-                     <label htmlFor="nom">nom :</label>
-                     <input type="text" name="nom" />
-                  </div>
-                  <div className="w-full">
-                     <label htmlFor="description">description :</label>
-                     <textarea name="description" rows={4}></textarea>
-                  </div>
-                  <div className="w-full">
                      <label htmlFor="idSecretaire">sercretaire :</label>
                      <DropdownList
                         values={secretaireData.map((s) => ({

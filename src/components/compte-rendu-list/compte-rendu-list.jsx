@@ -221,9 +221,11 @@ function CompteRenduList({ idConsultation, userType }) {
             <h3 id="1" className="collapse-item title__1 w-full">
                les comptes rendu
             </h3>
-            <button className="button__3" onClick={onAjouterCompteRendu}>
-               ajouter
-            </button>
+            {userType === "medecin" && (
+               <button className="button__3" onClick={onAjouterCompteRendu}>
+                  ajouter
+               </button>
+            )}
          </div>
          <div data-id="1" className="collapse-desc ">
             <table className="table__1 mb-16">
@@ -283,14 +285,17 @@ function CompteRenduList({ idConsultation, userType }) {
                                  <a href={BASE_URL + c.url} target="_blank">
                                     <i className="text-5xl text-gray-700 far fa-file-alt"></i>
                                  </a>
-                                 <button
-                                    onClick={() =>
-                                       onDeleteFichier(c.idCompteRendu)
-                                    }
-                                    className="text-4xl text-gray-800 ml-4"
-                                 >
-                                    &#x2715;
-                                 </button>
+                                 {(userType === "medecin" ||
+                                    userType === "secretaire") && (
+                                    <button
+                                       onClick={() =>
+                                          onDeleteFichier(c.idCompteRendu)
+                                       }
+                                       className="text-4xl text-gray-800 ml-4"
+                                    >
+                                       &#x2715;
+                                    </button>
+                                 )}
                               </>
                            ) : (
                               <>

@@ -176,12 +176,15 @@ function Consultation() {
                   >
                      Diagnostique
                   </a>
-                  <a
-                     className="link"
-                     onClick={(e) => changeRoute("prescription", e)}
-                  >
-                     Prescription
-                  </a>
+
+                  {(userType === "medecin" || userType === "patient") && (
+                     <a
+                        className="link"
+                        onClick={(e) => changeRoute("prescription", e)}
+                     >
+                        Prescription
+                     </a>
+                  )}
                </nav>
                {Route === "index" ? (
                   (userType === "medecin" || userType === "patient") && (
@@ -193,10 +196,12 @@ function Consultation() {
                      userType={userType}
                   />
                ) : Route === "prescription" ? (
-                  <Prescription
-                     idConsultation={consultation.idConsultation}
-                     userType={userType}
-                  />
+                  (userType === "medecin" || userType === "patient") && (
+                     <Prescription
+                        idConsultation={consultation.idConsultation}
+                        userType={userType}
+                     />
+                  )
                ) : (
                   <></>
                )}

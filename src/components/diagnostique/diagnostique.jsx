@@ -5,10 +5,13 @@ export const Diagnostique = ({ idConsultation, userType }) => {
    return (
       <>
          <div>
-            <CompteRenduList
-               idConsultation={idConsultation}
-               userType={userType}
-            />
+            {(userType === "medecin" || userType === "patient") && (
+               <CompteRenduList
+                  idConsultation={idConsultation}
+                  userType={userType}
+               />
+            )}
+
             <ExamenList idConsultation={idConsultation} userType={userType} />
          </div>
       </>
