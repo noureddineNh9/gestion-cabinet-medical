@@ -3,37 +3,33 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import Login from "./pages/login/login.component";
+import NotFound from "./pages/not-found/not-found";
+import Loading from "./components/utils/loading/loading";
+import Notification from "./components/utils/notification/notification";
 import secretaireRoute from "./routes/secretaireRoute";
 import adminRoute from "./routes/adminRoute";
 import MedecinRoute from "./routes/medecinRoute";
+import PatientRoute from "./routes/patientRoute";
 
+import ProtectedRoute from "./components/utils/ProtectedRoute";
+import { BASE_URL } from "./api/api";
+
+import { setPrescriptionData } from "./redux/prescription/prescription.actions";
+import { setCompteRenduData } from "./redux/compteRendu/compteRendu.actions";
+import { setCurrentUser } from "./redux/user/user.actions";
+import { setExamenData } from "./redux/examen/examen.action";
+import { setNotificationOff } from "./redux/notification/notification.actions";
+import { setSecretaireData } from "./redux/secretaire/secretaire.actions";
 import { setPatientsData } from "./redux/patient/patient.actions";
 import { setElementsSanteData } from "./redux/elementSante/elementSante.actions";
 import { setConsultationData } from "./redux/consultation/consultation.action";
 import { setMedecinData } from "./redux/medecin/medecin.actions";
-
-import { MEDECIN_DATA } from "./data";
-import PATIENTS_DATA from "./redux/patient/patients-data";
+import { setRendezVousData } from "./redux/rendez-vous/rendez-vous.actions";
+import { setAntecedentData } from "./redux/antecedent/antecedent.actions";
+import { setServiceData } from "./redux/service/service.actions";
 
 import "./styles/tailwind.css";
 import "./styles/main.scss";
-import { setCompteRenduData } from "./redux/compteRendu/compteRendu.actions";
-import { setPrescriptionData } from "./redux/prescription/prescription.actions";
-import { setExamenData } from "./redux/examen/examen.action";
-import NotFound from "./pages/not-found/not-found";
-import Loading from "./components/utils/loading/loading";
-import ProtectedRoute from "./components/utils/ProtectedRoute";
-import { setCurrentUser } from "./redux/user/user.actions";
-import { BASE_URL } from "./api/api";
-import Notification from "./components/utils/notification/notification";
-import { setNotificationOff } from "./redux/notification/notification.actions";
-import { setSecretaireData } from "./redux/secretaire/secretaire.actions";
-
-import Cookies from "js-cookie";
-import { setRendezVousData } from "./redux/rendez-vous/rendez-vous.actions";
-import { setAntecedentData } from "./redux/antecedent/antecedent.actions";
-import PatientRoute from "./routes/patientRoute";
-import { setServiceData } from "./redux/service/service.actions";
 
 function App() {
    const [isLoading, setIsLoading] = useState(true);
@@ -153,7 +149,11 @@ function App() {
             const res = await fetch(BASE_URL + "/api/consultation/getAll.php");
             if (res.status === 200) {
                const data = await res.json();
-               dispatch(setConsultationData(data));
+               dispatch(
+                  setConsultationData(
+                     data.sort((a, b) => b.idConsultation - a.idConsultation)
+                  )
+               );
             } else {
                throw new Error();
             }

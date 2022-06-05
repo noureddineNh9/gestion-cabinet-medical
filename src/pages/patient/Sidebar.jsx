@@ -10,6 +10,8 @@ const Sidebar = () => {
 
       navLinks.forEach((link) => {
          link.addEventListener("click", (e) => {
+            document.querySelector("#toggle-sidebar").checked = false;
+
             navLinks.forEach((link) => {
                link.classList.remove("active");
             });

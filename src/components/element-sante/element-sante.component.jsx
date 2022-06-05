@@ -10,6 +10,14 @@ import {
 } from "../../redux/notification/notification.actions";
 import ConsultationList from "../consultation-list/consultation-list";
 import Consultation from "../consultation/consultation.component";
+import { timeline } from "../../assets/timeline/src/js/timeline";
+
+import "./element-sante.styles.scss";
+
+import { jsPDF } from "jspdf";
+
+// Default export is a4 paper, portrait, using millimeters for units
+const doc = new jsPDF();
 
 const Index = ({ match }) => {
    const dispatch = useDispatch();
@@ -27,6 +35,12 @@ const Index = ({ match }) => {
                elem.disabled = true;
             });
       }
+
+      timeline(document.querySelectorAll(".timeline"), {
+         forceVerticalMode: 800,
+         mode: "horizontal",
+         visibleItems: 4,
+      });
    }, []);
 
    const ElementSante = useSelector(
@@ -34,7 +48,9 @@ const Index = ({ match }) => {
    );
 
    const consultations = useSelector((state) =>
-      state.consultation.filter((c) => c.idElement == idElement)
+      state.consultation
+         .filter((c) => c.idElement == idElement)
+         .sort((a, b) => b.idConsultation - a.idConsultation)
    );
 
    const handleSubmit = async (e) => {
@@ -132,6 +148,55 @@ const Index = ({ match }) => {
          <hr className="" />
          <br />
          <br />
+
+         <div class="timeline">
+            <div class="timeline__wrap">
+               <div class="timeline__items">
+                  {consultations
+                     .sort((a, b) => a.idConsultation - b.idConsultation)
+                     .map((c, index) => (
+                        <div key={c.idConsultation} className="timeline__item">
+                           <div className="timeline__content">
+                              <p className="text-gray-600 mb-2">{c.motif}</p>
+                           </div>
+                           <span className="date font-light text-slate-500 italic">
+                              {c.dateCreation}
+                           </span>
+                        </div>
+                     ))}
+               </div>
+            </div>
+         </div>
+
+         <br />
+         <br />
+         {/* 
+         <div className="flex justify-end">
+            <div>
+               <div className="motif__container w-full lg:max-w-3xl px-8 mb-12">
+                  <h3 className="mb-6 text-slate-500 font-semibold">
+                     les motif des consultation
+                  </h3>
+
+                  {consultations.map((c, index) => (
+                     <div
+                        key={c.idConsultation}
+                        className={`${
+                           index !== consultations.length - 1 && "mb-8 border-b"
+                        } p-2`}
+                     >
+                        <p className="text-gray-600 mb-2">{c.motif}</p>
+                        <div className="flex justify-end  mb-2">
+                           <span className="font-light text-slate-500 italic">
+                              {c.dateCreation}
+                           </span>
+                        </div>
+                     </div>
+                  ))}
+               </div>
+            </div>
+         </div> */}
+
          <ConsultationList
             idElement={idElement}
             consultations={consultations}

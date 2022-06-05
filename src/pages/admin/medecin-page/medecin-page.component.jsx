@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../api/api";
 
@@ -18,12 +18,16 @@ import {
 function MedecinPage() {
    const [operation, setOperation] = useState("");
    const [filteredData, setFilteredData] = useState([]);
+   const [formError, setFormErreur] = useState("");
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
    const MedecinData = useSelector((state) => state.medecin);
    const ServiceData = useSelector((state) => state.service);
    const dispatch = useDispatch();
+
+   const cinInput = useRef();
+   const emailInput = useRef();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -46,6 +50,26 @@ function MedecinPage() {
       const formData = new FormData(e.target);
       console.log(Object.fromEntries(formData));
       const idUtilisateur = formData.get("idUtilisateur");
+
+      if (
+         MedecinData.filter((m) => m.cin == formData.get("cin")).length !== 0
+      ) {
+         console.log("cin deja exist !");
+         cinInput.current.classList.add("input__error");
+      } else {
+         cinInput.current.classList.remove("input__error");
+      }
+
+      if (
+         MedecinData.filter((m) => m.email == formData.get("email")).length !==
+         0
+      ) {
+         console.log("email deja exist !");
+         emailInput.current.classList.add("input__error");
+      } else {
+         emailInput.current.classList.remove("input__error");
+      }
+
       if (idUtilisateur) {
          fetch(BASE_URL + "/api/medecin/put.php", {
             method: "post",
@@ -148,6 +172,7 @@ function MedecinPage() {
             elem.value = "";
          });
       setPreviewImage(defaultImageProfile);
+      cinInput.current.classList.remove("input__error");
    };
 
    const showPreview = (e) => {
@@ -282,11 +307,21 @@ function MedecinPage() {
 
                      <div className="w-full">
                         <label htmlFor="nom">nom :</label>
-                        <input type="text" name="nom" placeholder="nom" />
+                        <input
+                           type="text"
+                           name="nom"
+                           placeholder="nom"
+                           required
+                        />
                      </div>
                      <div className="w-full">
                         <label htmlFor="prenom">prenom :</label>
-                        <input type="text" name="prenom" placeholder="prenom" />
+                        <input
+                           type="text"
+                           name="prenom"
+                           placeholder="prenom"
+                           required
+                        />
                      </div>
                   </div>
                   <div className="flex gap-6 mb-4">
@@ -294,12 +329,12 @@ function MedecinPage() {
                         <label htmlFor="dateNaissance">
                            date de naissance :
                         </label>
-                        <input type="date" name="dateNaissance" />
+                        <input type="date" name="dateNaissance" required />
                      </div>
                   </div>
                   <div className="w-full">
                      <label>service :</label>
-                     <select name="idService">
+                     <select name="idService" required>
                         {ServiceData.map((s) => (
                            <option key={s.idService} value={s.idService}>
                               {s.nom}
@@ -308,13 +343,18 @@ function MedecinPage() {
                      </select>
                   </div>
                   <div className="flex gap-6 mb-4">
-                     <div className="w-full">
+                     <div className="w-full form__group " ref={cinInput}>
                         <label htmlFor="cin">cne :</label>
-                        <input type="text" name="cin" placeholder="cin" />
+                        <input
+                           type="text"
+                           name="cin"
+                           placeholder="cin"
+                           required
+                        />
                      </div>
                      <div className="w-full">
                         <label htmlFor="genre">genre :</label>
-                        <select type="text" name="genre">
+                        <select type="text" name="genre" required>
                            <option>homme</option>
                            <option>femme</option>
                         </select>
@@ -323,7 +363,7 @@ function MedecinPage() {
                         <label htmlFor="situationFamilliale">
                            situation familliale :
                         </label>
-                        <select type="text" name="situationFamilliale">
+                        <select type="text" name="situationFamilliale" required>
                            <option>marie</option>
                            <option>celibataire</option>
                            <option>Divorce</option>
@@ -332,9 +372,14 @@ function MedecinPage() {
                         </select>
                      </div>
                   </div>
-                  <div className="w-full">
+                  <div ref={emailInput} className="w-full form__group">
                      <label htmlFor="email">email :</label>
-                     <input type="text" name="email" placeholder="email" />
+                     <input
+                        type="text"
+                        name="email"
+                        placeholder="email"
+                        required
+                     />
                   </div>
                   {operation === "ajouter" && (
                      <div className="w-full">
@@ -343,13 +388,14 @@ function MedecinPage() {
                            type="password"
                            name="motDePasse"
                            placeholder="motDePasse"
+                           required
                         />
                      </div>
                   )}
 
                   <div className="w-full">
                      <label htmlFor="tel">tel :</label>
-                     <input type="text" name="tel" placeholder="tel" />
+                     <input type="text" name="tel" placeholder="tel" required />
                   </div>
                   <div className="w-full">
                      <label htmlFor="adresse">adresse :</label>
@@ -357,6 +403,7 @@ function MedecinPage() {
                         name="adresse"
                         rows="6"
                         placeholder="adresse"
+                        required
                      ></textarea>
                   </div>
                   <button className="button__1" type="submit">

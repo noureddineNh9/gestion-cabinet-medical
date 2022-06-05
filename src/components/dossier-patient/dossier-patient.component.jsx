@@ -51,6 +51,8 @@ function DossierPatient(props) {
 
       navLinks.forEach((link) => {
          link.addEventListener("click", (e) => {
+            document.querySelector("#toggle-sidebar").checked = false;
+
             navLinks.forEach((link) => {
                link.classList.remove("active");
             });
@@ -61,6 +63,18 @@ function DossierPatient(props) {
 
    return (
       <div>
+         <input
+            className="toggle__checkbox"
+            type="checkbox"
+            id="toggle-sidebar"
+         />
+         <label
+            id="sidebar-button"
+            className="sidebar__button"
+            htmlFor="toggle-sidebar"
+         >
+            <span className="sidebar__icon"></span>
+         </label>
          <div id="dossier-sidebar" className="sidebar h-screen">
             <div className="p-8">
                <Link to="/" className="lien__2">

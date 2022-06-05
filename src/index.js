@@ -8,6 +8,7 @@ import store from "./redux/store";
 import { Provider } from "react-redux";
 
 import "./assets/fontawesome-free-5.15.4-web/css/all.css";
+import "./assets/timeline/src/scss/timeline.scss";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

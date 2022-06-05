@@ -59,6 +59,16 @@ input:focus {
 }
 
 .form__1 {
+   .form__group {
+      &.input__error {
+         input {
+            border: 1px solid rgb(230, 71, 71);
+         }
+         label {
+            color: rgb(230, 71, 71);
+         }
+      }
+   }
    input,
    textarea,
    select {

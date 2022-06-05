@@ -136,8 +136,14 @@ function PatientStatistique({ idPatient, consultationsData }) {
                      Remarques
                   </h3>
 
-                  {derniersConsultation.map((c) => (
-                     <div key={c.idConsultation} className=" mb-8 border-b p-2">
+                  {derniersConsultation.map((c, index) => (
+                     <div
+                        key={c.idConsultation}
+                        className={`${
+                           index !== derniersConsultation.length - 1 &&
+                           "mb-8 border-b"
+                        } p-2`}
+                     >
                         <p className="text-gray-600 mb-2">{c.remarques}</p>
                         <div className="flex justify-end  mb-2">
                            <span className="font-light text-slate-500 italic">

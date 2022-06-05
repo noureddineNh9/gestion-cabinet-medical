@@ -11,6 +11,12 @@ import {
 import { BASE_URL } from "../../api/api";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+
+// Default export is a4 paper, portrait, using millimeters for units
+const doc = new jsPDF();
+
 export const Prescription = ({ idConsultation, userType }) => {
    const [ButtonValue, setButtonValue] = useState("ajouter");
 
@@ -128,6 +134,7 @@ export const Prescription = ({ idConsultation, userType }) => {
       setButtonValue("ajouter");
       initializeForm();
       showModal();
+      Convert_HTML_To_PDF();
    };
 
    const onUpdateMedicament = (id) => {
@@ -224,11 +231,26 @@ export const Prescription = ({ idConsultation, userType }) => {
          console.log("erreur");
       }
    };
+
+   async function Convert_HTML_To_PDF() {
+      var elementHTML = document.getElementById("contentToPrint");
+      const canvas = await html2canvas(elementHTML);
+      const data = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF();
+      const imgProperties = pdf.getImageProperties(data);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
+
+      pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("print.pdf");
+   }
+
    return (
       <>
          {prescription ? (
             <>
-               <div className="form__2">
+               <div className="form__2 " id="contentToPrint">
                   <div className="flex items-center mb-8">
                      <h3 className=" w-full">list des médicaments</h3>
                      {userType === "medecin" && (
