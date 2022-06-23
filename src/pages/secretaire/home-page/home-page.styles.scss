@@ -1,0 +1,35 @@
+.title__4 {
+   font-size: 2rem;
+   text-align: center;
+   padding: 15px 5px;
+   color: blue;
+}
+li {
+   list-style-type: circle;
+}
+
+.calendier__container {
+   padding: 15px 15px;
+   background-color: white;
+   position: relative;
+   //border-radius: 6px;
+
+   box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
+      rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+   // background: linear-gradient(
+   //    121deg,
+   //    var(--color-lightgray-4) 0%,
+   //    rgba(0, 212, 255, 0) 80%
+   // );
+   transition: all 0.3s;
+
+   &::before {
+      position: absolute;
+      content: "";
+      background-color: var(--color-primary-1);
+      height: 100%;
+      width: 5px;
+      left: 0;
+      top: 0;
+   }
+}

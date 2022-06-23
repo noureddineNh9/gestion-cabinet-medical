@@ -131,10 +131,12 @@ function RendezVousPage() {
    const handleSubmit = async (e) => {
       e.preventDefault();
       const formData = new FormData(formElement.current);
-      formData.append("idPatient", patientSelected.id);
-      formData.append("idMedecin", medecinSelected.id);
-
-      console.log(Object.fromEntries(formData));
+      if (patientSelected) {
+         formData.append("idPatient", patientSelected.id);
+      }
+      if (medecinSelected) {
+         formData.append("idMedecin", medecinSelected.id);
+      }
 
       if (!formData.get("idRDV")) {
          //ajouter
@@ -147,7 +149,6 @@ function RendezVousPage() {
 
             if (res.status === 200) {
                const data = await res.json();
-               console.log(data);
                dispatch(setRendezVous(data));
 
                dispatch(
@@ -157,9 +158,17 @@ function RendezVousPage() {
                   })
                );
                hideModal();
+            } else {
+               throw Error;
             }
          } catch (error) {
-            console.log("erreur");
+            dispatch(
+               setNotificationOn({
+                  time: 1500,
+                  message: "form non valide",
+                  type: "error",
+               })
+            );
          }
       } else {
          //modifier
@@ -171,7 +180,6 @@ function RendezVousPage() {
 
             if (res.status === 200) {
                const data = await res.json();
-               console.log(data);
                dispatch(updateRendezVous(data));
 
                dispatch(
@@ -181,9 +189,17 @@ function RendezVousPage() {
                   })
                );
                hideModal();
+            } else {
+               throw Error;
             }
          } catch (error) {
-            console.log("erreur");
+            dispatch(
+               setNotificationOn({
+                  time: 1500,
+                  message: "form non valide",
+                  type: "error",
+               })
+            );
          }
       }
    };
@@ -225,7 +241,6 @@ function RendezVousPage() {
 
          if (res.status === 200) {
             const data = await res.json();
-            console.log(data);
             dispatch(deleteRendezVous({ idRDV: id }));
 
             dispatch(

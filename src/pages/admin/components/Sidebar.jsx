@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import LogoutButton from "../../../components/LogoutButton";
 
+import logo from "../../../assets/icons/logo-gcm.png";
+
 const Sidebar = () => {
    useEffect(() => {
       const navLinks = document.querySelectorAll(".sidebar .menu .link");
@@ -32,8 +34,10 @@ const Sidebar = () => {
             <span className="sidebar__icon"></span>
          </label>
          <div className="sidebar h-screen">
-            <div className="p-8 mb-24">
-               <h4 className="text-center font-semibold">Medical</h4>
+            <div className="p-8 mb-8">
+               <div className="flex justify-center">
+                  <img src={logo} className="h-56" />
+               </div>
             </div>
             <ul className="menu">
                <Link className="link active" to="/admin">

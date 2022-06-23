@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { Switch, Route } from "react-router-dom";
 import DossierPatient from "../components/dossier-patient/dossier-patient.component";
 import UpdatePasswordPage from "../components/UpdatePasswordPage";
@@ -19,7 +20,11 @@ function PatientRoute() {
                <Sidebar />
                <div className="content p-8">
                   <Switch>
-                     <Route exact path="/patient" component={HomePage} />
+                     <Route
+                        exact
+                        path="/patient"
+                        render={() => <Redirect to="/patient/rendez-vous" />}
+                     />
                      <Route
                         exact
                         path="/patient/rendez-vous"

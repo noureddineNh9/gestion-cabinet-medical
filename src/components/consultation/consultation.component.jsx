@@ -120,7 +120,11 @@ function Consultation() {
    const match = useRouteMatch();
    const idConsultation = match.params.id;
 
-   const userType = useSelector((state) => state.user.type);
+   var userType = useSelector((state) => state.user.type);
+
+   const idUtilisateur = useSelector(
+      (state) => state.user.currentUser.idUtilisateur
+   );
 
    const [Route, setRoute] = useState("index");
    const [isLoading, setIsLoading] = useState(true);
@@ -139,6 +143,10 @@ function Consultation() {
       )[0];
       return { ...consultation, medecin };
    });
+
+   if (userType === "medecin" && idUtilisateur !== consultation.idMedecin) {
+      userType = "patient";
+   }
 
    useEffect(() => {
       if (consultation) {

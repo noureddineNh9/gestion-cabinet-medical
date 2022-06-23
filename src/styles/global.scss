@@ -87,6 +87,12 @@ input:focus {
       }
    }
 
+   input[type="radio"] {
+      width: auto;
+      margin-bottom: 0;
+      margin-right: 3px;
+   }
+
    label {
       margin-bottom: 2px;
       font-weight: 500;
@@ -215,6 +221,12 @@ input:focus {
 .lien__2 {
    color: var(--color-red);
    text-decoration: underline;
+   cursor: pointer;
+}
+
+.lien__3 {
+   color: var(--color-primary-1);
+   font-weight: 500;
    cursor: pointer;
 }
 

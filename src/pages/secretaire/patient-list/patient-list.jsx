@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../api/api";
 
@@ -17,6 +17,10 @@ import { Link } from "react-router-dom";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import MyDataTable from "../../../components/utils/my-data-table/my-data-table";
 import UpdatePassword from "../../admin/components/UpdatePassword";
+import {
+   setNotificationOff,
+   setNotificationOn,
+} from "../../../redux/notification/notification.actions";
 
 function PatientList() {
    const PatientData = useSelector((state) => state.patient);
@@ -26,6 +30,8 @@ function PatientList() {
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
    const dispatch = useDispatch();
+   const cinInput = useRef();
+   const emailInput = useRef();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -51,38 +57,30 @@ function PatientList() {
    const handleSubmit = async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
-      const idUtilisateur = formData.get("idUtilisateur");
-      if (idUtilisateur) {
-         try {
-            const res = await fetch(BASE_URL + "/api/patient/put.php", {
-               method: "post",
-               body: formData,
-            });
 
-            if (res.status === 200) {
-               const data = await res.json();
-               dispatch(updatePatient(data));
-               hideModal();
-            } else {
-               throw Error;
-            }
-         } catch (error) {}
-      } else {
-         try {
-            const res = await fetch(BASE_URL + "/api/patient/post.php", {
-               method: "post",
-               body: formData,
-            });
+      try {
+         const res = await fetch(BASE_URL + "/api/patient/post.php", {
+            method: "post",
+            body: formData,
+         });
 
-            if (res.status === 200) {
-               const data = await res.json();
-               dispatch(ajouterPatient(data));
-               hideModal();
-            } else {
-               throw Error;
-            }
-         } catch (error) {}
+         if (res.status === 200) {
+            const data = await res.json();
+            dispatch(ajouterPatient(data));
+            hideModal();
+         } else {
+            throw Error;
+         }
+      } catch (error) {
+         dispatch(
+            setNotificationOn({
+               time: 1500,
+               message: "form non valide",
+               type: "error",
+            })
+         );
       }
+      validation(formData);
    };
 
    const onAjoute = () => {
@@ -111,6 +109,27 @@ function PatientList() {
                m.prenom.toLowerCase().includes(mot.toLowerCase())
          )
       );
+   };
+
+   const validation = (formData) => {
+      if (
+         PatientData.filter((m) => m.cin == formData.get("cin")).length !== 0
+      ) {
+         console.log("cin deja exist !");
+         cinInput.current.classList.add("input__error");
+      } else {
+         cinInput.current.classList.remove("input__error");
+      }
+
+      if (
+         PatientData.filter((m) => m.email == formData.get("email")).length !==
+         0
+      ) {
+         console.log("email deja exist !");
+         emailInput.current.classList.add("input__error");
+      } else {
+         emailInput.current.classList.remove("input__error");
+      }
    };
 
    const initializeForm = () => {
@@ -275,8 +294,8 @@ function PatientList() {
                      </div>
                   </div>
                   <div className="flex gap-6 mb-4">
-                     <div className="w-full">
-                        <label htmlFor="cin">cne :</label>
+                     <div ref={cinInput} className="w-full form__group">
+                        <label htmlFor="cin">cin :</label>
                         <input type="text" name="cin" placeholder="cin" />
                      </div>
                      <div className="w-full">
@@ -303,7 +322,7 @@ function PatientList() {
                      <label>ville :</label>
                      <input type="text" name="ville" placeholder="ville" />
                   </div>
-                  <div className="w-full">
+                  <div ref={emailInput} className="w-full form__group">
                      <label htmlFor="email">email :</label>
                      <input type="text" name="email" placeholder="email" />
                   </div>

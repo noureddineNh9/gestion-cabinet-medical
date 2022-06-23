@@ -21,6 +21,8 @@ function ConsultationList({ idElement, consultations, mode }) {
    const filterForm = useRef();
    const dispatch = useDispatch();
 
+   const user = useSelector((state) => state.user);
+
    let medecinId = [];
    consultations.forEach((c) => {
       if (!medecinId.includes(c.idMedecin)) {
@@ -92,11 +94,17 @@ function ConsultationList({ idElement, consultations, mode }) {
 
    useEffect(() => {
       setFilteredItems(
-         consultations.filter((m) =>
-            m.dateCreation
-               .toLowerCase()
-               .includes(searchInputValue.toLowerCase())
-         )
+         consultations
+            .sort(
+               (a, b) =>
+                  new Date(b.dateCreation).getTime() -
+                  new Date(a.dateCreation).getTime()
+            )
+            .filter((m) =>
+               m.dateCreation
+                  .toLowerCase()
+                  .includes(searchInputValue.toLowerCase())
+            )
       );
    }, [searchInputValue, consultations]);
 
@@ -326,7 +334,7 @@ function ConsultationList({ idElement, consultations, mode }) {
                      hidden
                      type="number"
                      name="idMedecin"
-                     defaultValue={2}
+                     defaultValue={user.currentUser.idUtilisateur}
                   />
                   <div className="w-full">
                      <label htmlFor="duree">duree :</label>

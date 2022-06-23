@@ -78,12 +78,13 @@ function Login() {
          <div className="login__page min-h-screen grid grid-cols-12">
             <div className="left__part col-span-5 hidden lg:flex p-8">
                <div className="">
-                  <h1>Mon Cabinet Medical</h1>
+                  <h1>Gestion Cabinet Medical</h1>
                   <p>
-                     L'objectif de ce site est de faire partager et de diffuser
-                     très facilement les cours enseignés de la filière Sciences
-                     Mathématiques et informatique (SMI) au niveau de la Faculté
-                     des Sciences AÏN CHOK (FSAC) , Université HASSAN II (UH2) .{" "}
+                     Une application informatique pour la gestion d'un cabinet
+                     médical, pour faciliter la communication et l’échange de
+                     l’information entre les utilisateurs et et faire une
+                     gestion globale du dossier de patient qu’est le lieu de
+                     recueil et de conservation ses informations
                   </p>
                </div>
             </div>

@@ -253,7 +253,7 @@ function DiagnistiqueAudioPage() {
    return (
       <div className="">
          <h2 className="title__1">En Attente</h2>
-         <br />
+         {/* <br />
          <div className="flex justify-between mb-8">
             <div className="relative">
                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -267,16 +267,16 @@ function DiagnistiqueAudioPage() {
                />
             </div>
          </div>
-         <hr />
+         <hr /> */}
          <br />
          <div className="mb-12">
             <CompteRenduList comptesRenduData={compteRenduEnAttente} />
          </div>
 
          <h2 className="title__1">Completé</h2>
-
+         {/*
          <br />
-         <div className="flex justify-between mb-8">
+          <div className="flex justify-between mb-8">
             <div className="relative">
                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <i className="w-5 h-5 text-gray-500 fas fa-search"></i>
@@ -289,7 +289,7 @@ function DiagnistiqueAudioPage() {
                />
             </div>
          </div>
-         <hr />
+         <hr /> */}
          <br />
          <div className="mb-12">
             <CompteRenduList comptesRenduData={compteRenduComplete} />

@@ -24,7 +24,7 @@ function HomePage() {
    );
 
    const prochainRDV = rendezVous.sort(
-      (a, b) => new Date(b.dateRDV).getTime() - new Date(a.dateRDV).getTime()
+      (a, b) => new Date(a.dateRDV).getTime() - new Date(b.dateRDV).getTime()
    )[0];
 
    const nbConsultations = consultations.length;

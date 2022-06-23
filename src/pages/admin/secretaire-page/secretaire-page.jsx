@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../api/api";
 
@@ -18,11 +18,15 @@ import {
 
 function SecretairePage() {
    const [filteredData, setFilteredData] = useState([]);
+   const [operation, setOperation] = useState("");
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
    const SecretaireData = useSelector((state) => state.secretaire);
    const dispatch = useDispatch();
+
+   const cinInput = useRef();
+   const emailInput = useRef();
 
    const [modalActive, setModalActive] = useState(false);
    const showModal = () => {
@@ -77,9 +81,12 @@ function SecretairePage() {
             })
             .catch((err) => {});
       }
+
+      validation(formData);
    };
 
    const onAjoute = () => {
+      setOperation("ajouter");
       showModal();
    };
 
@@ -97,6 +104,8 @@ function SecretairePage() {
    };
 
    const onUpdate = (id) => {
+      setOperation("modifier");
+
       setModalActive(true);
 
       const form = document.querySelector("#medecinForm");
@@ -126,6 +135,27 @@ function SecretairePage() {
                m.prenom.toLowerCase().includes(mot.toLowerCase())
          )
       );
+   };
+
+   const validation = (formData) => {
+      if (
+         SecretaireData.filter((m) => m.cin == formData.get("cin")).length !== 0
+      ) {
+         console.log("cin deja exist !");
+         cinInput.current.classList.add("input__error");
+      } else {
+         cinInput.current.classList.remove("input__error");
+      }
+
+      if (
+         SecretaireData.filter((m) => m.email == formData.get("email"))
+            .length !== 0
+      ) {
+         console.log("email deja exist !");
+         emailInput.current.classList.add("input__error");
+      } else {
+         emailInput.current.classList.remove("input__error");
+      }
    };
 
    const initializeForm = () => {
@@ -288,8 +318,8 @@ function SecretairePage() {
                      </div>
                   </div>
                   <div className="flex gap-6 mb-4">
-                     <div className="w-full">
-                        <label htmlFor="cin">cne :</label>
+                     <div ref={cinInput} className="w-full form__group">
+                        <label htmlFor="cin">cin :</label>
                         <input type="text" name="cin" placeholder="cin" />
                      </div>
                      <div className="w-full">
@@ -312,18 +342,21 @@ function SecretairePage() {
                         </select>
                      </div>
                   </div>
-                  <div className="w-full">
+                  <div ref={emailInput} className="w-full form__group">
                      <label htmlFor="email">email :</label>
                      <input type="text" name="email" placeholder="email" />
                   </div>
-                  <div className="w-full">
-                     <label htmlFor="motDePasse">mot de passe :</label>
-                     <input
-                        type="password"
-                        name="motDePasse"
-                        placeholder="motDePasse"
-                     />
-                  </div>
+                  {operation === "ajouter" && (
+                     <div className="w-full">
+                        <label htmlFor="motDePasse">mot de passe :</label>
+                        <input
+                           type="password"
+                           name="motDePasse"
+                           placeholder="motDePasse"
+                           required
+                        />
+                     </div>
+                  )}
                   <div className="w-full">
                      <label htmlFor="tel">tel :</label>
                      <input type="text" name="tel" placeholder="tel" />
@@ -337,7 +370,7 @@ function SecretairePage() {
                      ></textarea>
                   </div>
                   <button className="button__1" type="submit">
-                     Ajouter
+                     {operation}
                   </button>
                </form>
             </div>

@@ -18,7 +18,6 @@ import {
 function MedecinPage() {
    const [operation, setOperation] = useState("");
    const [filteredData, setFilteredData] = useState([]);
-   const [formError, setFormErreur] = useState("");
 
    const [previewImage, setPreviewImage] = useState(defaultImageProfile);
 
@@ -50,25 +49,6 @@ function MedecinPage() {
       const formData = new FormData(e.target);
       console.log(Object.fromEntries(formData));
       const idUtilisateur = formData.get("idUtilisateur");
-
-      if (
-         MedecinData.filter((m) => m.cin == formData.get("cin")).length !== 0
-      ) {
-         console.log("cin deja exist !");
-         cinInput.current.classList.add("input__error");
-      } else {
-         cinInput.current.classList.remove("input__error");
-      }
-
-      if (
-         MedecinData.filter((m) => m.email == formData.get("email")).length !==
-         0
-      ) {
-         console.log("email deja exist !");
-         emailInput.current.classList.add("input__error");
-      } else {
-         emailInput.current.classList.remove("input__error");
-      }
 
       if (idUtilisateur) {
          fetch(BASE_URL + "/api/medecin/put.php", {
@@ -105,6 +85,29 @@ function MedecinPage() {
                dispatch(ajouterMedecin(data));
             })
             .catch((err) => {});
+      }
+
+      validation(formData);
+   };
+
+   const validation = (formData) => {
+      if (
+         MedecinData.filter((m) => m.cin == formData.get("cin")).length !== 0
+      ) {
+         console.log("cin deja exist !");
+         cinInput.current.classList.add("input__error");
+      } else {
+         cinInput.current.classList.remove("input__error");
+      }
+
+      if (
+         MedecinData.filter((m) => m.email == formData.get("email")).length !==
+         0
+      ) {
+         console.log("email deja exist !");
+         emailInput.current.classList.add("input__error");
+      } else {
+         emailInput.current.classList.remove("input__error");
       }
    };
 
@@ -173,6 +176,7 @@ function MedecinPage() {
          });
       setPreviewImage(defaultImageProfile);
       cinInput.current.classList.remove("input__error");
+      emailInput.current.classList.remove("input__error");
    };
 
    const showPreview = (e) => {
@@ -407,7 +411,7 @@ function MedecinPage() {
                      ></textarea>
                   </div>
                   <button className="button__1" type="submit">
-                     Ajouter
+                     {operation}
                   </button>
                </form>
             </div>

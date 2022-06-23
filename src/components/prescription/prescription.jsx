@@ -11,12 +11,6 @@ import {
 import { BASE_URL } from "../../api/api";
 import { setNotificationOn } from "../../redux/notification/notification.actions";
 
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
-
-// Default export is a4 paper, portrait, using millimeters for units
-const doc = new jsPDF();
-
 export const Prescription = ({ idConsultation, userType }) => {
    const [ButtonValue, setButtonValue] = useState("ajouter");
 
@@ -71,12 +65,20 @@ export const Prescription = ({ idConsultation, userType }) => {
 
    const initializeForm = () => {
       formElement.current
-         .querySelectorAll("input, textarea")
+         .querySelectorAll("input:not([type='radio']), textarea")
          .forEach((elem) => {
             elem.value = "";
          });
 
+      // formElement.current
+      //    .querySelectorAll("input[type='radio']")
+      //    .forEach((elem) => {
+      //       elem.checked = false;
+      //    });
       formElement.current.idPrescription.value = prescription.idPrescription;
+      formElement.current.matin.value = "aucun";
+      formElement.current.midi.value = "aucun";
+      formElement.current.soir.value = "aucun";
    };
 
    const handleSubmit = async (e) => {
@@ -85,7 +87,8 @@ export const Prescription = ({ idConsultation, userType }) => {
       const idMedicament = formData.get("idMedicament");
 
       if (!idMedicament) {
-         // ajouter
+         console.log(Object.fromEntries(formData));
+         //ajouter;
          try {
             const res = await fetch(BASE_URL + "/api/medicament/post.php", {
                method: "post",
@@ -134,7 +137,6 @@ export const Prescription = ({ idConsultation, userType }) => {
       setButtonValue("ajouter");
       initializeForm();
       showModal();
-      Convert_HTML_To_PDF();
    };
 
    const onUpdateMedicament = (id) => {
@@ -142,13 +144,23 @@ export const Prescription = ({ idConsultation, userType }) => {
          (m) => m.idMedicament == id
       )[0];
 
+      console.log(medicament);
+
+      // formElement.current
+      //    .querySelectorAll("input[type='radio']")
+      //    .forEach((elem) => {
+      //       elem.checked = false;
+      //    });
+
       formElement.current.idMedicament.value = medicament.idMedicament;
 
       formElement.current.nom.value = medicament.nom;
       formElement.current.descriptionTraitement.value =
          medicament.descriptionTraitement;
       formElement.current.dureeParJour.value = medicament.dureeParJour;
-      formElement.current.dosage.value = medicament.dosage;
+      formElement.current.matin.value = medicament.matin;
+      formElement.current.midi.value = medicament.midi;
+      formElement.current.soir.value = medicament.soir;
 
       setButtonValue("modifier");
       showModal();
@@ -231,20 +243,6 @@ export const Prescription = ({ idConsultation, userType }) => {
          console.log("erreur");
       }
    };
-
-   async function Convert_HTML_To_PDF() {
-      var elementHTML = document.getElementById("contentToPrint");
-      const canvas = await html2canvas(elementHTML);
-      const data = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF();
-      const imgProperties = pdf.getImageProperties(data);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
-
-      pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("print.pdf");
-   }
 
    return (
       <>
@@ -410,9 +408,128 @@ export const Prescription = ({ idConsultation, userType }) => {
                            </label>
                            <input type="number" name="dureeParJour" />
                         </div>
-                        <div className="w-full">
-                           <label htmlFor="dosage">durée de traitement :</label>
-                           <input type="text" name="dosage" />
+
+                        <br />
+
+                        <div className="w-full flex flex-wrap">
+                           <label htmlFor="matin" className="mr-4 mb-0">
+                              matin :
+                           </label>
+                           <div className="flex flex-wrap">
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="matin"
+                                    value="aucun"
+                                 />
+                                 <span>aucun</span>
+                              </div>
+
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="matin"
+                                    value="avant"
+                                 />
+                                 <span>avant</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="matin"
+                                    value="auMilieu"
+                                 />
+                                 <span>au milieu</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="matin"
+                                    value="apres"
+                                 />
+                                 <span>apres</span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="w-full flex flex-wrap">
+                           <label htmlFor="midi" className="mr-4 mb-0">
+                              midi :
+                           </label>
+                           <div className="flex flex-wrap">
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="midi"
+                                    value="aucun"
+                                 />
+                                 <span>aucun</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="midi"
+                                    value="avant"
+                                 />
+                                 <span>avant</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="midi"
+                                    value="auMilieu"
+                                 />
+                                 <span>au milieu</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="midi"
+                                    value="apres"
+                                 />
+                                 <span>apres</span>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="w-full flex flex-wrap">
+                           <label htmlFor="soir" className="mr-4 mb-0">
+                              soir :
+                           </label>
+                           <div className="flex flex-wrap">
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="soir"
+                                    value="aucun"
+                                 />
+                                 <span>aucun</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="soir"
+                                    value="avant"
+                                 />
+                                 <span>avant</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="soir"
+                                    value="auMilieu"
+                                 />
+                                 <span>au milieu</span>
+                              </div>
+                              <div className="flex items-center mr-4">
+                                 <input
+                                    type="radio"
+                                    name="soir"
+                                    value="apres"
+                                 />
+                                 <span>apres</span>
+                              </div>
+                           </div>
                         </div>
                         <hr />
                         <br />

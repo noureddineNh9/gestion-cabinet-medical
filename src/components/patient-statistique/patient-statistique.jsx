@@ -27,7 +27,11 @@ function PatientStatistique({ idPatient, consultationsData }) {
    });
 
    const derniersConsultation = consultations
-      .sort((a, b) => b.idConsultation - a.idConsultation)
+      .sort(
+         (a, b) =>
+            new Date(b.dateCreation).getTime() -
+            new Date(a.dateCreation).getTime()
+      )
       .filter((c, i) => i < 3);
 
    console.log(derniersConsultation);
@@ -96,65 +100,67 @@ function PatientStatistique({ idPatient, consultationsData }) {
          <br />
          <hr />
          <br />
-         <div>
-            <h3 className="text-slate-500 font-semibold mb-4">
-               Pourcentage de consultations pour chaque élément de santé
-            </h3>
-            <div className="container mb-12">
-               <CanvasJSChart
-                  options={options}
-                  /* onRef={ref => this.chart = ref} */
-               />
-            </div>
-            <div className="lg:flex gap-8 ">
-               <div className="dernier__consultation w-full mb-12">
-                  <div className="flex justify-between items-center mb-6">
-                     <h3 className="text-slate-500 font-semibold">
-                        Dernier consultation
+         {derniersConsultation.length !== 0 && (
+            <div>
+               <h3 className="text-slate-500 font-semibold mb-4">
+                  Pourcentage de consultations pour chaque élément de santé
+               </h3>
+               <div className="container mb-12">
+                  <CanvasJSChart
+                     options={options}
+                     /* onRef={ref => this.chart = ref} */
+                  />
+               </div>
+               <div className="lg:flex gap-8 ">
+                  <div className="dernier__consultation w-full mb-12">
+                     <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-slate-500 font-semibold">
+                           Dernier consultation
+                        </h3>
+
+                        <span className="date h-max">
+                           {derniersConsultation[0].dateCreation}
+                        </span>
+                     </div>
+                     <p className="mb-6 ">
+                        <strong>motif de consultation : </strong>
+                        <span className="text-gray-600">
+                           {derniersConsultation[0].motif}
+                        </span>
+                     </p>
+
+                     <p>
+                        <strong>remarques : </strong>
+                        <span className="text-gray-600">
+                           {derniersConsultation[0].remarques}
+                        </span>
+                     </p>
+                  </div>
+                  <div className="remarques__container w-full lg:max-w-3xl px-8 mb-12">
+                     <h3 className="mb-6 text-slate-500 font-semibold">
+                        Remarques
                      </h3>
 
-                     <span className="date h-max">
-                        {derniersConsultation[0].dateCreation}
-                     </span>
-                  </div>
-                  <p className="mb-6 ">
-                     <strong>motif de consultation : </strong>
-                     <span className="text-gray-600">
-                        {derniersConsultation[0].motif}
-                     </span>
-                  </p>
-
-                  <p>
-                     <strong>remarques : </strong>
-                     <span className="text-gray-600">
-                        {derniersConsultation[0].remarques}
-                     </span>
-                  </p>
-               </div>
-               <div className="remarques__container w-full lg:max-w-3xl px-8 mb-12">
-                  <h3 className="mb-6 text-slate-500 font-semibold">
-                     Remarques
-                  </h3>
-
-                  {derniersConsultation.map((c, index) => (
-                     <div
-                        key={c.idConsultation}
-                        className={`${
-                           index !== derniersConsultation.length - 1 &&
-                           "mb-8 border-b"
-                        } p-2`}
-                     >
-                        <p className="text-gray-600 mb-2">{c.remarques}</p>
-                        <div className="flex justify-end  mb-2">
-                           <span className="font-light text-slate-500 italic">
-                              {c.dateCreation}
-                           </span>
+                     {derniersConsultation.map((c, index) => (
+                        <div
+                           key={c.idConsultation}
+                           className={`${
+                              index !== derniersConsultation.length - 1 &&
+                              "mb-8 border-b"
+                           } p-2`}
+                        >
+                           <p className="text-gray-600 mb-2">{c.remarques}</p>
+                           <div className="flex justify-end  mb-2">
+                              <span className="font-light text-slate-500 italic">
+                                 {c.dateCreation}
+                              </span>
+                           </div>
                         </div>
-                     </div>
-                  ))}
+                     ))}
+                  </div>
                </div>
             </div>
-         </div>
+         )}
       </div>
    );
 }

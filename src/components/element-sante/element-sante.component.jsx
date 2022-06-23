@@ -149,27 +149,37 @@ const Index = ({ match }) => {
          <br />
          <br />
 
-         <div class="timeline">
-            <div class="timeline__wrap">
-               <div class="timeline__items">
-                  {consultations
-                     .sort((a, b) => a.idConsultation - b.idConsultation)
-                     .map((c, index) => (
-                        <div key={c.idConsultation} className="timeline__item">
-                           <div className="timeline__content">
-                              <p className="text-gray-600 mb-2">{c.motif}</p>
-                           </div>
-                           <span className="date font-light text-slate-500 italic">
-                              {c.dateCreation}
-                           </span>
-                        </div>
-                     ))}
+         {consultations.length !== 0 && (
+            <>
+               <div class="timeline">
+                  <div class="timeline__wrap">
+                     <div class="timeline__items">
+                        {consultations
+                           .sort((a, b) => a.idConsultation - b.idConsultation)
+                           .map((c, index) => (
+                              <div
+                                 key={c.idConsultation}
+                                 className="timeline__item"
+                              >
+                                 <div className="timeline__content">
+                                    <p className="text-gray-600 mb-2">
+                                       {c.motif}
+                                    </p>
+                                 </div>
+                                 <span className="date font-light text-slate-500 italic">
+                                    {c.dateCreation}
+                                 </span>
+                              </div>
+                           ))}
+                     </div>
+                  </div>
                </div>
-            </div>
-         </div>
 
-         <br />
-         <br />
+               <br />
+               <br />
+            </>
+         )}
+
          {/* 
          <div className="flex justify-end">
             <div>

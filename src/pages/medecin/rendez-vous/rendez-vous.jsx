@@ -11,7 +11,9 @@ function RendezVous() {
    const currentUser = useSelector((state) => state.user.currentUser);
 
    const RendezVousData = useSelector((state) =>
-      selectRdvByMedecin(state, currentUser.idUtilisateur)
+      selectRdvByMedecin(state, currentUser.idUtilisateur).filter(
+         (r) => new Date(r.dateRDV).getTime() > new Date().getTime()
+      )
    );
 
    useEffect(() => {
@@ -52,7 +54,7 @@ function RendezVous() {
          <MyDataTable
             columns={columns}
             data={filteredItems}
-            // defaultSortField="idElement"
+            defaultSortFieldId={3}
             striped
             pagination
          />
