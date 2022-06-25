@@ -14,7 +14,9 @@ import {
 } from "../../../redux/rendez-vous/rendez-vous.actions";
 
 function RendezVous() {
-   const idPatient = 12;
+   const currentUser = useSelector((state) => state.user.currentUser);
+
+   const idPatient = currentUser.idUtilisateur;
 
    const [modalActive, setModalActive] = useState(false);
 

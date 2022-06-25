@@ -82,12 +82,7 @@ const LoginForm = () => {
                      />
                      <i class="fas fa-lock icon"></i>
                   </div>
-                  <div className="mb-12 flex justify-end">
-                     <a className="lien font-light" href="">
-                        mot de passe oublié ?
-                     </a>
-                  </div>
-                  <div className="">
+                  <div className="mt-12">
                      <button type="submit" className="text-2xl">
                         login
                      </button>

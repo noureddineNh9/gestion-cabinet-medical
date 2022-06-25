@@ -14,6 +14,7 @@ import {
    deleteMedecin,
    updateMedecin,
 } from "../../../redux/medecin/medecin.actions";
+import { setNotificationOn } from "../../../redux/notification/notification.actions";
 
 function MedecinPage() {
    const [operation, setOperation] = useState("");
@@ -65,6 +66,12 @@ function MedecinPage() {
             .then((data) => {
                console.log(data);
                dispatch(updateMedecin(data));
+               dispatch(
+                  setNotificationOn({
+                     time: 3000,
+                     message: "médecin modifier",
+                  })
+               );
                initializeForm();
             })
             .catch((err) => {});
@@ -83,6 +90,13 @@ function MedecinPage() {
             .then((data) => {
                initializeForm();
                dispatch(ajouterMedecin(data));
+
+               dispatch(
+                  setNotificationOn({
+                     time: 3000,
+                     message: "médecin crée",
+                  })
+               );
             })
             .catch((err) => {});
       }

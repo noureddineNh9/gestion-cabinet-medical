@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import LogoutButton from "../../components/LogoutButton";
 import { setCurrentUser } from "../../redux/user/user.actions";
 import logo from "../../assets/icons/logo-gcm.png";
 const Sidebar = () => {
+   const currentUser = useSelector((state) => state.user.currentUser);
+
    useEffect(() => {
       const navLinks = document.querySelectorAll(".sidebar .menu .link");
 
@@ -45,7 +47,10 @@ const Sidebar = () => {
                {/* <Link className="link active" to="/patient">
                   <i className="fas fa-home"></i> Home
                </Link> */}
-               <Link className="link" to="/patient/dossier/12">
+               <Link
+                  className="link"
+                  to={`/patient/dossier/${currentUser.idUtilisateur}`}
+               >
                   <i className="fas fa-user"></i> Mon Dossier
                </Link>
                <Link className="link active" to="/patient/rendez-vous">
